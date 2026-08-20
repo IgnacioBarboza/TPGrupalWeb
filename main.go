@@ -7,7 +7,6 @@ func main() {
   staticDir := "./static"
   
   fileServer := http.FileServer(http.Dir(staticDir))
-  //Preguntar si el fileserver ya maneja el content Type
   http.Handle("/", fileServer)
 
   port := ":8080"
