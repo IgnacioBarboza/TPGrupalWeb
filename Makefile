@@ -42,7 +42,7 @@ test:
 # Empieza el container
 upDocker:
 	@echo "DEBUG upDocker"
-	docker compose up
+	docker compose up -d
 
 buildDocker:
 	@echo "DEBUG buildDocker"

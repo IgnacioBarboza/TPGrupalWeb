@@ -12,7 +12,7 @@ type Castmember struct {
 	Castmemberid     int32  `json:"castmemberid"`
 	Castmembername   string `json:"castmembername"`
 	Castmemberrole   string `json:"castmemberrole"`
-	Castmembergender bool   `json:"castmembergender"`
+	Castmembergender string `json:"castmembergender"`
 }
 
 type Film struct {
@@ -60,5 +60,5 @@ type User struct {
 	Username           string    `json:"username"`
 	Userpasswordhashed string    `json:"userpasswordhashed"`
 	Userbirthday       time.Time `json:"userbirthday"`
-	Usergenre          bool      `json:"usergenre"`
+	Usergenre          string    `json:"usergenre"`
 }

@@ -7,7 +7,7 @@ CREATE TABLE CastMember (
     CastMemberId serial  NOT NULL,
     CastMemberName varchar(100)  NOT NULL,
     CastMemberRole char(1)  NOT NULL,
-    CastMemberGender boolean  NOT NULL,
+    CastMemberGender char  NOT NULL,
     CONSTRAINT CastMember_pk PRIMARY KEY (CastMemberId)
 );
 
@@ -71,7 +71,7 @@ CREATE TABLE "User" (
     UserName varchar(120)  NOT NULL,
     UserPasswordHashed varchar(200)  NOT NULL,
     UserBirthday date  NOT NULL,
-    UserGenre boolean  NOT NULL,
+    UserGenre char  NOT NULL,
     CONSTRAINT User_pk PRIMARY KEY (UserID)
 );
 

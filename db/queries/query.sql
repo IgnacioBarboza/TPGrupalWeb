@@ -1,4 +1,4 @@
--- name: CreateFilm :exec
+-- name: CreateFilm :one
 INSERT INTO Film(FilmId,FilmTitle,FilmReleaseDate,FilmDuration) 
 VALUES($1,$2,$3,$4)
 RETURNING FilmId,FilmTitle,FilmReleaseDate,FilmDuration;
@@ -21,7 +21,7 @@ WHERE FilmId = $1;
 DELETE FROM Film
 WHERE FilmId = $1;
 
--- name: CreateCastMember :exec
+-- name: CreateCastMember :one
 INSERT INTO CastMember(CastMemberId, CastMemberName, CastMemberRole, CastMemberGender)
 VALUES($1, $2, $3, $4)
 RETURNING CastMemberId, CastMemberName, CastMemberRole, CastMemberGender;
@@ -44,7 +44,7 @@ WHERE CastMemberId = $1;
 DELETE FROM CastMember
 WHERE CastMemberId = $1;
 
--- name: CreateFilmCast :exec
+-- name: CreateFilmCast :one
 INSERT INTO FilmCast(FIlmId, CastMemberId)
 VALUES($1, $2)
 RETURNING FIlmId, CastMemberId;
@@ -62,7 +62,7 @@ FROM FilmCast;
 DELETE FROM FilmCast
 WHERE FIlmId = $1 AND CastMemberId = $2;
 
--- name: CreateFilmGenre :exec
+-- name: CreateFilmGenre :one
 INSERT INTO FilmGenre(Genre_GenreID, Film_FilmId)
 VALUES($1, $2)
 RETURNING Genre_GenreID, Film_FilmId;
@@ -80,7 +80,7 @@ FROM FilmGenre;
 DELETE FROM FilmGenre
 WHERE Genre_GenreID = $1 AND Film_FilmId = $2;
 
--- name: CreateFilmUserStatus :exec
+-- name: CreateFilmUserStatus :one
 INSERT INTO FilmUserStatus(Status_StatusId, Film_FilmId, User_UserID)
 VALUES($1, $2, $3)
 RETURNING Status_StatusId, Film_FilmId, User_UserID;
@@ -103,7 +103,7 @@ WHERE Film_FilmId = $1 AND User_UserID = $2;
 DELETE FROM FilmUserStatus
 WHERE Film_FilmId = $1 AND User_UserID = $2;
 
--- name: CreateGenre :exec
+-- name: CreateGenre :one
 INSERT INTO Genre(GenreID, GenreName)
 VALUES($1, $2)
 RETURNING GenreID, GenreName;
@@ -126,7 +126,7 @@ WHERE GenreID = $1;
 DELETE FROM Genre
 WHERE GenreID = $1;
 
--- name: CreateReview :exec
+-- name: CreateReview :one
 INSERT INTO Review(ReviewStars, ReviewDescription, ReviewUserID, ReviewFilmId)
 VALUES($1, $2, $3, $4)
 RETURNING ReviewStars, ReviewDescription, ReviewUserID, ReviewFilmId;
@@ -149,7 +149,7 @@ WHERE ReviewFilmId = $1 AND ReviewUserID = $2;
 DELETE FROM Review
 WHERE ReviewFilmId = $1 AND ReviewUserID = $2;
 
--- name: CreateStatus :exec
+-- name: CreateStatus :one
 INSERT INTO Status(StatusId, StatusName)
 VALUES($1, $2)
 RETURNING StatusId, StatusName;
@@ -172,7 +172,7 @@ WHERE StatusId = $1;
 DELETE FROM Status
 WHERE StatusId = $1;
 
--- name: CreateUser :exec
+-- name: CreateUser :one
 INSERT INTO "User"(UserID, UserName, UserPasswordHashed, UserBirthday, UserGenre)
 VALUES($1, $2, $3, $4, $5)
 RETURNING UserID, UserName, UserPasswordHashed, UserBirthday, UserGenre;
