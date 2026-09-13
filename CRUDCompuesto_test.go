@@ -169,7 +169,7 @@ func TestCRUDFilmUserStatus(t *testing.T) {
 		// 3. Crear Status 1 y 2 (para poder probar el Update)
 		s1, err := repository.CreateStatus(ctx, db.CreateStatusParams{
 			Statusid: 1,
-			Statusname: "Viendo"
+			Statusname: "Viendo",
 		})
 
 		if err != nil { 
@@ -179,8 +179,8 @@ func TestCRUDFilmUserStatus(t *testing.T) {
 
 		s2, err := repository.CreateStatus(ctx, db.CreateStatusParams{
 			Statusid: 2,
-			Statusname: "Completado"}
-		)
+			Statusname: "Completado",
+		})
 		if err != nil { 
 			t.Fatalf("Error Status 2: %v", err) 
 		}
