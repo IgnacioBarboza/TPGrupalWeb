@@ -69,8 +69,13 @@ rebuild: downDocker
 	@echo "DEBUG rebuild"
 	docker compose up -d --build    
 
-# Construye, levanta y testea
-start: buildDocker upDocker test
+# Limpia lo viejo, construye, levanta, testea y limpia
+start: cleanVolumenes generatesqlc buildDocker upDocker
+	@echo "Ejecutando tests..."
+	make test
+	@echo "Tests exitosos, procediendo a limpiar..."
+	make cleanVolumenes
+	make clean
 	@echo "DEBUG start completado"
 
 help:
