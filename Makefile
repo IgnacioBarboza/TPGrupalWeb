@@ -1,14 +1,8 @@
-# Cargar variables desde .env
-include .env
-export $(shell sed 's/=.*//' .env)
-
 # Si el usuario no envia parametros, corre esto
 .DEFAULT_GOAL := help
 
 # Variables
 APP_NAME := app
-DB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
-
 SQLC_GENERATED := $(shell ls ./db/sqlc 2>/dev/null || echo "")
 
 # Chequea si esta esta generado sqlc, sino lo genera
@@ -59,8 +53,12 @@ rebuild: downDocker
 	@echo "DEBUG rebuild"
 	docker compose up -d --build    
 
+# Copiamos las variables de entorno
+copyEnv:
+	cp .env.example .env
+
 # Limpia lo viejo, construye, levanta, testea y limpia
-start: cleanVolumenes generatesqlc buildDocker upDocker
+start: copyEnv cleanVolumenes generatesqlc buildDocker upDocker
 	@echo "Ejecutando tests..."
 	make test
 	@echo "Tests exitosos, procediendo a limpiar..."

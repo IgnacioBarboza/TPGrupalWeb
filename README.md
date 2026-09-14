@@ -37,6 +37,14 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 
 ## Setup
 
+1. Clonar el repositorio y hacer checkout sobre el branch correcto (tp2):
+
+```bash
+   git clone https://github.com/IgnacioBarboza/TPGrupalWeb/
+   cd TPGrupalWeb
+   git checkout tp2
+```
+
 1. Copiar el archivo de variables de entorno de ejemplo y completarlo:
 
 ```bash
