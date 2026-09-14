@@ -21,7 +21,7 @@ check-sqlc:
 	fi
 
 # Ejecuta install-sqlc y luego check-sqlc
-generatesqlc: install-sqlc check-sqlc
+generatesqlc: check-sqlc
 	@echo "DEBUG generatesqlc terminado"
 
 # Hacer testeos (rm = borrar luego de ejecutar)
@@ -59,12 +59,8 @@ rebuild: downDocker
 	@echo "DEBUG rebuild"
 	docker compose up -d --build    
 
-# Copia el env de ejemplo como .env
-copyEnv: 
-	cp .env.example .env
-
 # Limpia lo viejo, construye, levanta, testea y limpia
-start: cleanVolumenes copyEnv generatesqlc buildDocker upDocker
+start: cleanVolumenes generatesqlc buildDocker upDocker
 	@echo "Ejecutando tests..."
 	make test
 	@echo "Tests exitosos, procediendo a limpiar..."
