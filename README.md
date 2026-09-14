@@ -66,7 +66,7 @@ Los más usados:
 | **make generatesqlc** | Instala sqlc (si falta) y genera el código en db/sqlc/ |
 
 ## Tests
-**ESTO SE ENCUENTRA INCLUIDO DENTRO DEL MAKE START, NO EJECUTAR DE MANERA AISLADA**
+**ESTO SE ENCUENTRA INCLUIDO DENTRO DEL MAKE START, NO EJECUTAR DE MANERA AISLADA** \n
 Los tests se corren dentro del contenedor de la API, para no depender de tener Go o Postgres instalados localmente:
 
 ```bash
