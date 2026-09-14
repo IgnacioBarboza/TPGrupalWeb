@@ -37,15 +37,19 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 
 ## Setup
 
-Levanta todo (copia variables de entorno + build + up + tests + clean) con un solo comando:
+1. Copiar el archivo de variables de entorno de ejemplo y completarlo:
 
-   ```bash
+```bash
+   cp .env.example .env
+```
+
+2. Levantar todo (build + up + tests) con un solo comando:
+
+```bash
    make start
-   ```
+```
 
-   Esto limpia volúmenes viejos, copia las variables de entorno del archivo .env.example a un propio .env, genera el código de sqlc si falta, construye las imágenes, levanta los contenedores, corre los tests, y limpia todo al final. **Es el comando que se debe utilizar para probar el trabajo**
-
-## Comandos disponibles
+Esto limpia volúmenes viejos, genera el código de sqlc si falta, construye las imágenes, levanta los contenedores, corre los tests, y limpia todo al final. **Es el comando que se debe utilizar para probar el trabajo**
 
 Los comandos se manejan con make:
 
@@ -55,17 +59,18 @@ make help
 
 Los más usados:
 
-| Comando | Qué hace |
-|---|---|
-| **make start** | Build + up + test + limpieza, todo en un paso (quickstart) |
-| **make upDocker** | Levanta los contenedores (api + database) |
-| **make downDocker** | Frena los contenedores |
-| **make test** | Corre los tests dentro del contenedor |
-| **make rebuild** | Frena y reconstruye los contenedores desde cero |
-| **make cleanVolumenes** | Frena los contenedores y borra los volúmenes de Postgres |
-| **make generatesqlc** | Instala sqlc (si falta) y genera el código en db/sqlc/ |
+| Comando                 | Qué hace                                                   |
+| ----------------------- | ---------------------------------------------------------- |
+| **make start**          | Build + up + test + limpieza, todo en un paso (quickstart) |
+| **make upDocker**       | Levanta los contenedores (api + database)                  |
+| **make downDocker**     | Frena los contenedores                                     |
+| **make test**           | Corre los tests dentro del contenedor                      |
+| **make rebuild**        | Frena y reconstruye los contenedores desde cero            |
+| **make cleanVolumenes** | Frena los contenedores y borra los volúmenes de Postgres   |
+| **make generatesqlc**   | Instala sqlc (si falta) y genera el código en db/sqlc/     |
 
 ## Tests
+
 **ESTO SE ENCUENTRA INCLUIDO DENTRO DEL MAKE START, NO EJECUTAR DE MANERA AISLADA** <br>
 Los tests se corren dentro del contenedor de la API, para no depender de tener Go o Postgres instalados localmente:
 
