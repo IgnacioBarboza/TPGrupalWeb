@@ -7,19 +7,9 @@ export $(shell sed 's/=.*//' .env)
 
 # Variables
 APP_NAME := app
-SQLC_BIN := $(shell which sqlc 2>/dev/null || echo "")
 DB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 
 SQLC_GENERATED := $(shell ls ./db/sqlc 2>/dev/null || echo "")
-
-# Instalar sqlc si no existe
-install-sqlc:
-	@if [ -z "$(SQLC_BIN)" ]; then \
-		echo "Instalando sqlc..."; \
-		go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest; \
-	else \
-		echo "sqlc ya está instalado en $(SQLC_BIN)"; \
-	fi
 
 # Chequea si esta esta generado sqlc, sino lo genera
 check-sqlc:
