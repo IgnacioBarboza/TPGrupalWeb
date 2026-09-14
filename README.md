@@ -45,19 +45,13 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
    git checkout tp2
 ```
 
-1. Copiar el archivo de variables de entorno de ejemplo y completarlo:
-
-```bash
-   cp .env.example .env
-```
-
-2. Levantar todo (build + up + tests) con un solo comando:
+2. Levantar todo (copy env variables + build + up + tests) con un solo comando:
 
 ```bash
    make start
 ```
 
-Esto limpia volúmenes viejos, genera el código de sqlc si falta, construye las imágenes, levanta los contenedores, corre los tests, y limpia todo al final. **Es el comando que se debe utilizar para probar el trabajo**
+Esto copia las variables de entorno de un env.example, limpia volúmenes viejos, genera el código de sqlc si falta, construye las imágenes, levanta los contenedores, corre los tests, y limpia todo al final. **Es el comando que se debe utilizar para probar el trabajo**
 
 Los comandos se manejan con make:
 
