@@ -43,7 +43,6 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
    cp .env.example .env
    ```
 
-   Los valores por defecto de .env.example ya funcionan para desarrollo local; no hace falta tocarlos salvo que quieras otra contraseña.
 
 2. Levantar todo (build + up + tests + clean) con un solo comando:
 
