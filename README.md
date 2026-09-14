@@ -17,7 +17,7 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 ├── db/
 │   ├── schema/       # DDL de las tablas (Postgres)
 │   ├── queries/       # Queries .sql usadas por sqlc
-│   └── sqlc/          # Código Go generado por sqlc ->Esto habría que sacarlo(?
+│   └── sqlc/          # Código Go que se te va a generar
 ├── static/             # Archivos estáticos servidos por la API
 ├── CRUDSimple_test.go     # Tests de CRUD simple (Film, User, Genre, Status, CastMember)
 ├── CRUDCompuesto_test.go  # Tests de CRUD sobre relaciones (Review, FilmCast, FilmGenre, FilmUserStatus)
@@ -33,7 +33,7 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 
 - Go 1.25+
 - Docker y Docker Compose
-- `sqlc` (el Makefile lo instala automáticamente si no lo tenés)
+- sqlc
 
 ## Setup
 
@@ -45,13 +45,13 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 
    Los valores por defecto de .env.example ya funcionan para desarrollo local; no hace falta tocarlos salvo que quieras otra contraseña.
 
-2. Levantar todo (build + up + tests) con un solo comando:
+2. Levantar todo (build + up + tests + clean) con un solo comando:
 
    ```bash
    make start
    ```
 
-   Esto limpia volúmenes viejos, genera el código de sqlc si falta, construye las imágenes, levanta los contenedores, corre los tests, y limpia todo al final. Es el comando recomendado para verificar que el proyecto anda de punta a punta.
+   Esto limpia volúmenes viejos, genera el código de sqlc si falta, construye las imágenes, levanta los contenedores, corre los tests, y limpia todo al final. **Es el comando que se debe utilizar para probar el trabajo**
 
 ## Comandos disponibles
 
