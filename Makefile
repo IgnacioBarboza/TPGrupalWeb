@@ -59,8 +59,12 @@ rebuild: downDocker
 	@echo "DEBUG rebuild"
 	docker compose up -d --build    
 
+# Copia el env de ejemplo como .env
+copyEnv: 
+	cp .env.example .env
+
 # Limpia lo viejo, construye, levanta, testea y limpia
-start: cleanVolumenes generatesqlc buildDocker upDocker
+start: cleanVolumenes copyEnv generatesqlc buildDocker upDocker
 	@echo "Ejecutando tests..."
 	make test
 	@echo "Tests exitosos, procediendo a limpiar..."
