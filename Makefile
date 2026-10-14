@@ -66,6 +66,18 @@ start: copyEnv cleanVolumenes generatesqlc buildDocker upDocker
 	make clean
 	@echo "DEBUG start completado"
 
+# Levanta la base de datos
+maketest-start: copyEnv check-sqlc
+	@echo "\n=== Iniciando Servidor de Pruebas ==="
+	@docker compose up --build 
+
+# Frena el servidor y limpia los volúmenes
+maketest-stop:
+	@echo "\n=== Apagando y Limpiando ==="
+	@docker compose down >/dev/null 2>&1
+	@echo "=== Finalizado ==="
+
+
 help:
 	@echo "Posibles Comandos:"
 	@echo ""

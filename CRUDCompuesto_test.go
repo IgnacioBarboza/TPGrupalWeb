@@ -8,7 +8,7 @@ import(
 	_ "github.com/lib/pq" //Driver postgresql
 )
 func TestCRUDReview(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 
 	ctx := context.Background()
 	repository := db.New(connection)
@@ -134,7 +134,7 @@ func TestCRUDReview(t *testing.T) {
 }
 
 func TestCRUDFilmUserStatus(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 	ctx := context.Background()
 	repository := db.New(connection)
 
@@ -247,7 +247,7 @@ func TestCRUDFilmUserStatus(t *testing.T) {
 	})
 }
 func TestCRUDFilmCast(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 	ctx := context.Background()
 	repository := db.New(connection)
 
@@ -317,7 +317,7 @@ func TestCRUDFilmCast(t *testing.T) {
 }
 
 func TestCRUDFilmGenre(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 	ctx := context.Background()
 	repository := db.New(connection)
 

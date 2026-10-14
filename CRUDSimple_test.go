@@ -11,7 +11,7 @@ import(
 	_ "github.com/lib/pq" //Driver postgresql
 )
 
-func OpenDB(t *testing.T) *sql.DB {
+func OpenDBTesting(t *testing.T) *sql.DB {
 
 	// Seteo variables
 	host := os.Getenv("DB_HOST")
@@ -49,7 +49,7 @@ func OpenDB(t *testing.T) *sql.DB {
 }
 
 func TestCRUDFilm(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 
 	ctx := context.Background()
 	repository := db.New(connection)
@@ -133,7 +133,7 @@ func TestCRUDFilm(t *testing.T) {
 }
 
 func TestCRUDUser(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 	ctx := context.Background()
 	repository := db.New(connection)
 
@@ -193,7 +193,7 @@ func TestCRUDUser(t *testing.T) {
 }
 
 func TestCRUDGenre(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 	ctx := context.Background()
 	repository := db.New(connection)
 
@@ -244,7 +244,7 @@ func TestCRUDGenre(t *testing.T) {
 	})
 }
 func TestCRUDStatus(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 	ctx := context.Background()
 	repository := db.New(connection)
 
@@ -296,7 +296,7 @@ func TestCRUDStatus(t *testing.T) {
 }
 
 func TestCRUDCastMember(t *testing.T) {
-	connection := OpenDB(t)
+	connection := OpenDBTesting(t)
 	ctx := context.Background()
 	repository := db.New(connection)
 

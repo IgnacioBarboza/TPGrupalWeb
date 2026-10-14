@@ -29,7 +29,8 @@ go.work.sum
 *.env
 
 # No entregamos la carpeta SQLC
-./db/sqlc/
+
+db/sqlc/
 
 # log files
 *.log
