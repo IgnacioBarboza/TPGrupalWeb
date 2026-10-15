@@ -1,6 +1,6 @@
 -- name: CreateFilm :one
-INSERT INTO Film(FilmId,FilmTitle,FilmReleaseDate,FilmDuration) 
-VALUES($1,$2,$3,$4)
+INSERT INTO Film(FilmTitle,FilmReleaseDate,FilmDuration) 
+VALUES($1,$2,$3)
 RETURNING FilmId,FilmTitle,FilmReleaseDate,FilmDuration;
 
 -- name: GetFilm :one
@@ -22,8 +22,8 @@ DELETE FROM Film
 WHERE FilmId = $1;
 
 -- name: CreateCastMember :one
-INSERT INTO CastMember(CastMemberId, CastMemberName, CastMemberRole, CastMemberGender)
-VALUES($1, $2, $3, $4)
+INSERT INTO CastMember(CastMemberName, CastMemberRole, CastMemberGender)
+VALUES($1, $2, $3)
 RETURNING CastMemberId, CastMemberName, CastMemberRole, CastMemberGender;
 
 -- name: GetCastMember :one
@@ -104,8 +104,8 @@ DELETE FROM FilmUserStatus
 WHERE Film_FilmId = $1 AND User_UserID = $2;
 
 -- name: CreateGenre :one
-INSERT INTO Genre(GenreID, GenreName)
-VALUES($1, $2)
+INSERT INTO Genre(GenreName)
+VALUES($1)
 RETURNING GenreID, GenreName;
 
 -- name: GetGenre :one
@@ -150,8 +150,8 @@ DELETE FROM Review
 WHERE ReviewFilmId = $1 AND ReviewUserID = $2;
 
 -- name: CreateStatus :one
-INSERT INTO Status(StatusId, StatusName)
-VALUES($1, $2)
+INSERT INTO Status(StatusName)
+VALUES($1)
 RETURNING StatusId, StatusName;
 
 -- name: GetStatus :one
@@ -173,8 +173,8 @@ DELETE FROM Status
 WHERE StatusId = $1;
 
 -- name: CreateUser :one
-INSERT INTO "User"(UserID, UserName, UserPasswordHashed, UserBirthday, UserGenre)
-VALUES($1, $2, $3, $4, $5)
+INSERT INTO "User"(UserName, UserPasswordHashed, UserBirthday, UserGenre)
+VALUES($1, $2, $3, $4)
 RETURNING UserID, UserName, UserPasswordHashed, UserBirthday, UserGenre;
 
 -- name: GetUser :one

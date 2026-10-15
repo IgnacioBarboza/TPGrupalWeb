@@ -14,8 +14,12 @@ check-sqlc:
 		echo "sqlc ya fue ejecutado"; \
 	fi
 
+delete-sqlc:
+	@echo "DEBUG delete-sqlc"
+	rm -rf db/sqlc
+
 # Ejecuta install-sqlc y luego check-sqlc
-generatesqlc: check-sqlc
+generatesqlc: delete-sqlc check-sqlc
 	@echo "DEBUG generatesqlc terminado"
 
 # Hacer testeos (rm = borrar luego de ejecutar)

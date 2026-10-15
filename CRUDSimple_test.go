@@ -1,13 +1,14 @@
 package main
 
-import(
+import (
+	db "WebGrupal/db/sqlc"
 	"context"
+	"database/sql"
+	"fmt"
+	"os" // leer env
 	"testing"
 	"time"
-	"os" // leer env
-	"fmt"
-	db "WebGrupal/db/sqlc"
-	"database/sql"
+
 	_ "github.com/lib/pq" //Driver postgresql
 )
 
@@ -54,7 +55,7 @@ func TestCRUDFilm(t *testing.T) {
 	ctx := context.Background()
 	repository := db.New(connection)
 
-	fechaEstreno := time.Date(    // 2026 - 01 - 01  00hs 00min 00sec UTC
+	fechaEstreno := time.Date( // 2026 - 01 - 01  00hs 00min 00sec UTC
 		2026,
 		time.January,
 		1,
@@ -62,53 +63,52 @@ func TestCRUDFilm(t *testing.T) {
 		time.UTC,
 	)
 	pelicula_prueba := db.CreateFilmParams{
-		Filmid          :0,
-		Filmtitle       :"Pelicula Testeo",
-		Filmreleasedate :fechaEstreno,
-		Filmduration    :120,
+		Filmtitle:       "Pelicula Testeo",
+		Filmreleasedate: fechaEstreno,
+		Filmduration:    120,
 	}
 	pelicula, err := repository.CreateFilm(ctx, pelicula_prueba)
 	if err != nil {
-		t.Fatalf("No se pudo crear la pelicula por: %v",err)
+		t.Fatalf("No se pudo crear la pelicula por: %v", err)
 	}
 
 	id := pelicula.Filmid
 
 	t.Run("editar film", func(t *testing.T) {
 		pelicula_actualizada := db.UpdateFilmParams{
-			Filmid          : id,
-			Filmtitle       : "Pelicula Editada",
-			Filmreleasedate : pelicula_prueba.Filmreleasedate,
-			Filmduration    : pelicula_prueba.Filmduration,
+			Filmid:          id,
+			Filmtitle:       "Pelicula Editada",
+			Filmreleasedate: pelicula_prueba.Filmreleasedate,
+			Filmduration:    pelicula_prueba.Filmduration,
 		}
-		err = repository.UpdateFilm(ctx,pelicula_actualizada)
+		err = repository.UpdateFilm(ctx, pelicula_actualizada)
 		if err != nil {
-			t.Fatalf("No se puedo editar la pelicula por: %v",err)
-		}		
+			t.Fatalf("No se puedo editar la pelicula por: %v", err)
+		}
 	})
-	
+
 	t.Run("obtener film", func(t *testing.T) {
-		pelicula_obtenida, err := repository.GetFilm(ctx,id)
-		if err != nil{
-			t.Fatalf("No se pudo obtener la pelicula por: %v",err)
+		pelicula_obtenida, err := repository.GetFilm(ctx, id)
+		if err != nil {
+			t.Fatalf("No se pudo obtener la pelicula por: %v", err)
 		}
 
 		/*
-		t.Logf(
-			"esperada: id=%d fecha=%s titulo=%q duracion=%d",
-			id,
-			"2026-01-01",
-			"Pelicula Editada",
-			pelicula_prueba.Filmduration,
-		)
+			t.Logf(
+				"esperada: id=%d fecha=%s titulo=%q duracion=%d",
+				id,
+				"2026-01-01",
+				"Pelicula Editada",
+				pelicula_prueba.Filmduration,
+			)
 
-		t.Logf(
-			"Película obtenida: ID=%d, fecha=%s, duración=%d, título=%q",
-			pelicula_obtenida.Filmid,
-			pelicula_obtenida.Filmreleasedate.Format("2006-01-02"),
-			pelicula_obtenida.Filmduration,
-			pelicula_obtenida.Filmtitle,
-		)
+			t.Logf(
+				"Película obtenida: ID=%d, fecha=%s, duración=%d, título=%q",
+				pelicula_obtenida.Filmid,
+				pelicula_obtenida.Filmreleasedate.Format("2006-01-02"),
+				pelicula_obtenida.Filmduration,
+				pelicula_obtenida.Filmtitle,
+			)
 		*/
 		if pelicula_obtenida.Filmreleasedate.Format("2006-01-02") != "2026-01-01" {
 			t.Errorf("fecha incorrecta")
@@ -123,11 +123,10 @@ func TestCRUDFilm(t *testing.T) {
 		}
 	})
 
-
 	t.Run("borrar film", func(t *testing.T) {
-		err = repository.DeleteFilm(ctx,id)
+		err = repository.DeleteFilm(ctx, id)
 		if err != nil {
-			t.Fatalf("Hubo un error en el delete de la tabla Film por: %v",err)
+			t.Fatalf("Hubo un error en el delete de la tabla Film por: %v", err)
 		}
 	})
 }
@@ -144,7 +143,6 @@ func TestCRUDUser(t *testing.T) {
 
 	t.Run("Crear User", func(t *testing.T) {
 		u1 := db.CreateUserParams{
-			Userid:             0,
 			Username:           "Test Username",
 			Userpasswordhashed: "hashed_pass",
 			Userbirthday:       dateTesting,
@@ -201,10 +199,7 @@ func TestCRUDGenre(t *testing.T) {
 	var err error
 
 	t.Run("Crear Genre", func(t *testing.T) {
-		g1 := db.CreateGenreParams{
-			Genreid:   0,
-			Genrename: "Sci-Fi",
-		}
+		g1 := "Sci-Fi"
 
 		g, err := repository.CreateGenre(ctx, g1)
 		if err != nil {
@@ -252,10 +247,7 @@ func TestCRUDStatus(t *testing.T) {
 	var err error
 
 	t.Run("Crear Status", func(t *testing.T) {
-		s1 := db.CreateStatusParams{
-			Statusid:   0,
-			Statusname: "Pendiente",
-		}
+		s1 := "Pendiente"
 
 		s, err := repository.CreateStatus(ctx, s1)
 		if err != nil {
@@ -305,7 +297,6 @@ func TestCRUDCastMember(t *testing.T) {
 
 	t.Run("Crear CastMember", func(t *testing.T) {
 		c1 := db.CreateCastMemberParams{
-			Castmemberid:     0,
 			Castmembername:   "Actor Original",
 			Castmemberrole:   "A",
 			Castmembergender: "M",

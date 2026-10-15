@@ -1,17 +1,13 @@
-FROM golang:1.26.5-alpine
-
+# Etapa de build
+FROM golang:1.26.5-alpine AS builder
 WORKDIR /app
-
-# Copiar go.mod y go.sum para cachear dependencias
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
-# Lo de arriba queda cacheado,ya que no cambiara seguido
-
 COPY . .
-
-# Hacer test sin compilar o buildear el main.
-# Agregar al make Script que borre volumenes
-
 RUN go build -o app .
 
+# Etapa final
+FROM alpine:latest
+WORKDIR /app
+COPY --from=builder /app/app .
 CMD ["./app"]

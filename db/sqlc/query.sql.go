@@ -11,25 +11,19 @@ import (
 )
 
 const createCastMember = `-- name: CreateCastMember :one
-INSERT INTO CastMember(CastMemberId, CastMemberName, CastMemberRole, CastMemberGender)
-VALUES($1, $2, $3, $4)
+INSERT INTO CastMember(CastMemberName, CastMemberRole, CastMemberGender)
+VALUES($1, $2, $3)
 RETURNING CastMemberId, CastMemberName, CastMemberRole, CastMemberGender
 `
 
 type CreateCastMemberParams struct {
-	Castmemberid     int32  `json:"castmemberid"`
 	Castmembername   string `json:"castmembername"`
 	Castmemberrole   string `json:"castmemberrole"`
 	Castmembergender string `json:"castmembergender"`
 }
 
 func (q *Queries) CreateCastMember(ctx context.Context, arg CreateCastMemberParams) (Castmember, error) {
-	row := q.db.QueryRowContext(ctx, createCastMember,
-		arg.Castmemberid,
-		arg.Castmembername,
-		arg.Castmemberrole,
-		arg.Castmembergender,
-	)
+	row := q.db.QueryRowContext(ctx, createCastMember, arg.Castmembername, arg.Castmemberrole, arg.Castmembergender)
 	var i Castmember
 	err := row.Scan(
 		&i.Castmemberid,
@@ -41,25 +35,19 @@ func (q *Queries) CreateCastMember(ctx context.Context, arg CreateCastMemberPara
 }
 
 const createFilm = `-- name: CreateFilm :one
-INSERT INTO Film(FilmId,FilmTitle,FilmReleaseDate,FilmDuration) 
-VALUES($1,$2,$3,$4)
+INSERT INTO Film(FilmTitle,FilmReleaseDate,FilmDuration) 
+VALUES($1,$2,$3)
 RETURNING FilmId,FilmTitle,FilmReleaseDate,FilmDuration
 `
 
 type CreateFilmParams struct {
-	Filmid          int32     `json:"filmid"`
 	Filmtitle       string    `json:"filmtitle"`
 	Filmreleasedate time.Time `json:"filmreleasedate"`
 	Filmduration    int32     `json:"filmduration"`
 }
 
 func (q *Queries) CreateFilm(ctx context.Context, arg CreateFilmParams) (Film, error) {
-	row := q.db.QueryRowContext(ctx, createFilm,
-		arg.Filmid,
-		arg.Filmtitle,
-		arg.Filmreleasedate,
-		arg.Filmduration,
-	)
+	row := q.db.QueryRowContext(ctx, createFilm, arg.Filmtitle, arg.Filmreleasedate, arg.Filmduration)
 	var i Film
 	err := row.Scan(
 		&i.Filmid,
@@ -126,23 +114,18 @@ func (q *Queries) CreateFilmUserStatus(ctx context.Context, arg CreateFilmUserSt
 }
 
 const createGenre = `-- name: CreateGenre :one
-INSERT INTO Genre(GenreID, GenreName)
-VALUES($1, $2)
+INSERT INTO Genre(GenreName)
+VALUES($1)
 RETURNING GenreID, GenreName
 `
-
-type CreateGenreParams struct {
-	Genreid   int32  `json:"genreid"`
-	Genrename string `json:"genrename"`
-}
 
 type CreateGenreRow struct {
 	Genreid   int32  `json:"genreid"`
 	Genrename string `json:"genrename"`
 }
 
-func (q *Queries) CreateGenre(ctx context.Context, arg CreateGenreParams) (CreateGenreRow, error) {
-	row := q.db.QueryRowContext(ctx, createGenre, arg.Genreid, arg.Genrename)
+func (q *Queries) CreateGenre(ctx context.Context, genrename string) (CreateGenreRow, error) {
+	row := q.db.QueryRowContext(ctx, createGenre, genrename)
 	var i CreateGenreRow
 	err := row.Scan(&i.Genreid, &i.Genrename)
 	return i, err
@@ -179,31 +162,25 @@ func (q *Queries) CreateReview(ctx context.Context, arg CreateReviewParams) (Rev
 }
 
 const createStatus = `-- name: CreateStatus :one
-INSERT INTO Status(StatusId, StatusName)
-VALUES($1, $2)
+INSERT INTO Status(StatusName)
+VALUES($1)
 RETURNING StatusId, StatusName
 `
 
-type CreateStatusParams struct {
-	Statusid   int32  `json:"statusid"`
-	Statusname string `json:"statusname"`
-}
-
-func (q *Queries) CreateStatus(ctx context.Context, arg CreateStatusParams) (Status, error) {
-	row := q.db.QueryRowContext(ctx, createStatus, arg.Statusid, arg.Statusname)
+func (q *Queries) CreateStatus(ctx context.Context, statusname string) (Status, error) {
+	row := q.db.QueryRowContext(ctx, createStatus, statusname)
 	var i Status
 	err := row.Scan(&i.Statusid, &i.Statusname)
 	return i, err
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO "User"(UserID, UserName, UserPasswordHashed, UserBirthday, UserGenre)
-VALUES($1, $2, $3, $4, $5)
+INSERT INTO "User"(UserName, UserPasswordHashed, UserBirthday, UserGenre)
+VALUES($1, $2, $3, $4)
 RETURNING UserID, UserName, UserPasswordHashed, UserBirthday, UserGenre
 `
 
 type CreateUserParams struct {
-	Userid             int32     `json:"userid"`
 	Username           string    `json:"username"`
 	Userpasswordhashed string    `json:"userpasswordhashed"`
 	Userbirthday       time.Time `json:"userbirthday"`
@@ -212,7 +189,6 @@ type CreateUserParams struct {
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, createUser,
-		arg.Userid,
 		arg.Username,
 		arg.Userpasswordhashed,
 		arg.Userbirthday,
