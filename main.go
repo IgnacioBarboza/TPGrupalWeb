@@ -3,6 +3,7 @@ package main
 import (
 	db "WebGrupal/db/sqlc"
 	film "WebGrupal/internal/film"
+	Review "WebGrupal/internal/review"
 	"database/sql"
 	"fmt"
 	"log"
@@ -46,10 +47,9 @@ func OpenDB() *sql.DB {
 	return conn
 }
 
-// Handler global para poder ser usado en los tests de integración
+// Handler globales
 var filmHandler *film.FilmHandler
-
-//var reviewHandler *film.ReviewHandler
+var reviewHandler *Review.ReviewHandler
 
 func initializeServices() {
 	conn := OpenDB()
@@ -60,15 +60,16 @@ func initializeServices() {
 	filmSvc := film.NewFilmService(filmRepo)
 	filmHandler = film.NewFilmHandler(filmSvc)
 
-	//reviewRepo := review.NewSQLCRepository(queries)
-	//reviewSvc := review.NewFilmService(filmRepo)
-	//reviewHandler = review.NewFilmHandler(filmSvc)
+	reviewRepo := Review.NewSQLCRepository(queries)
+	reviewSvc := Review.NewReviewService(reviewRepo)
+	reviewHandler = Review.NewReviewHandler(reviewSvc)
 }
 
 func main() {
 	initializeServices()
 	mux := http.NewServeMux()
 	filmHandler.Register(mux)
+	reviewHandler.Register(mux)
 
 	log.Println("Escuchando en :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))

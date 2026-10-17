@@ -36,8 +36,11 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 
 // Casos de uso: GET /reviews/{filmID}/{userID}, PUT /reviews/{filmID}/{userID}, DELETE /reviews/{filmID}/{userID}
 func (h *ReviewHandler) handleReview(w http.ResponseWriter, r *http.Request) {
+	var filmID int32
+	var userID int32
 	if r.Method != http.MethodPost {
-		filmID, userID, err := extractIDs(r.URL.Path)
+		var err error
+		filmID, userID, err = extractIDs(r.URL.Path)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
