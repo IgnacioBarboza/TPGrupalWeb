@@ -2,8 +2,11 @@ package main
 
 import (
 	db "WebGrupal/db/sqlc"
+	CastMember "WebGrupal/internal/castmember"
 	film "WebGrupal/internal/film"
 	Review "WebGrupal/internal/review"
+	Status "WebGrupal/internal/status"
+	User "WebGrupal/internal/user"
 	"database/sql"
 	"fmt"
 	"log"
@@ -50,6 +53,9 @@ func OpenDB() *sql.DB {
 // Handler globales
 var filmHandler *film.FilmHandler
 var reviewHandler *Review.ReviewHandler
+var userHandler *User.UserHandler
+var statusHandler *Status.StatusHandler
+var castMemberHandler *CastMember.CastMemberHandler
 
 func initializeServices() {
 	conn := OpenDB()
@@ -63,6 +69,18 @@ func initializeServices() {
 	reviewRepo := Review.NewSQLCRepository(queries)
 	reviewSvc := Review.NewReviewService(reviewRepo)
 	reviewHandler = Review.NewReviewHandler(reviewSvc)
+
+	userRepo := User.NewSQLCRepository(queries)
+	userSvc := User.NewUserService(userRepo)
+	userHandler = User.NewUserHandler(userSvc)
+
+	statusRepo := Status.NewSQLCRepository(queries)
+	statusSvc := Status.NewStatusService(statusRepo)
+	statusHandler = Status.NewStatusHandler(statusSvc)
+
+	castMemberRepo := CastMember.NewSQLCRepository(queries)
+	castMemberSvc := CastMember.NewCastMemberService(castMemberRepo)
+	castMemberHandler = CastMember.NewCastMemberHandler(castMemberSvc)
 }
 
 func main() {
@@ -70,6 +88,9 @@ func main() {
 	mux := http.NewServeMux()
 	filmHandler.Register(mux)
 	reviewHandler.Register(mux)
+	userHandler.Register(mux)
+	statusHandler.Register(mux)
+	castMemberHandler.Register(mux)
 
 	log.Println("Escuchando en :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))

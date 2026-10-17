@@ -1,0 +1,64 @@
+# Crear film individual
+curl -i -X POST http://localhost:8080/films/0 -H "Content-Type: application/json" -d '{"filmtitle":"Inception","filmreleasedate":"2010-07-16T00:00:00Z","filmduration":148}'
+
+# Obtener film por ID
+curl -i http://localhost:8080/films/1
+
+# Actualizar film por ID
+curl -i -X PUT http://localhost:8080/films/1 -H "Content-Type: application/json" -d '{"filmid":1,"filmtitle":"Inception Editada","filmreleasedate":"2010-07-16T00:00:00Z","filmduration":150}'
+
+
+# Crear user individual
+curl -i -X POST http://localhost:8080/users/0 -H "Content-Type: application/json" -d '{"username":"juan","userpasswordhashed":"hash123","userbirthday":"2000-05-10T00:00:00Z","usergenre":"M"}'
+
+# Obtener user por ID
+curl -i http://localhost:8080/users/1
+
+# Actualizar user por ID
+curl -i -X PUT http://localhost:8080/users/1 -H "Content-Type: application/json" -d '{"userid":1,"username":"juan_editado","userpasswordhashed":"hash456","userbirthday":"2000-05-10T00:00:00Z","usergenre":"M"}'
+
+
+# Crear review individual
+curl -i -X POST http://localhost:8080/reviews/1/1 -H "Content-Type: application/json" -d '{"reviewstars":5,"reviewdescription":"Excelente pelicula","reviewuserid":1,"reviewfilmid":1}'
+
+# Obtener review por IDs
+curl -i http://localhost:8080/reviews/1/1
+
+# Actualizar review por IDs
+curl -i -X PUT http://localhost:8080/reviews/1/1 -H "Content-Type: application/json" -d '{"reviewstars":4,"reviewdescription":"Muy buena pelicula","reviewuserid":1,"reviewfilmid":1}'
+
+
+# Crear status individual
+curl -i -X POST http://localhost:8080/statuses/0 -H "Content-Type: application/json" -d '{"statusname":"Pendiente"}'
+
+# Obtener status por ID
+curl -i http://localhost:8080/statuses/1
+
+# Actualizar status por ID
+curl -i -X PUT http://localhost:8080/statuses/1 -H "Content-Type: application/json" -d '{"statusid":1,"statusname":"Visto"}'
+
+
+# Crear castmember individual
+curl -i -X POST http://localhost:8080/castmembers/0 -H "Content-Type: application/json" -d '{"castmembername":"Keanu Reeves","castmemberrole":"A","castmembergender":"M"}'
+
+# Obtener castmember por ID
+curl -i http://localhost:8080/castmembers/1
+
+# Actualizar castmember por ID
+curl -i -X PUT http://localhost:8080/castmembers/1 -H "Content-Type: application/json" -d '{"castmemberid":1,"castmembername":"Keanu Reeves Editado","castmemberrole":"D","castmembergender":"M"}'
+
+
+# Eliminar review por IDs
+curl -i -X DELETE http://localhost:8080/reviews/1/1
+
+# Eliminar film por ID
+curl -i -X DELETE http://localhost:8080/films/1
+
+# Eliminar user por ID
+curl -i -X DELETE http://localhost:8080/users/1
+
+# Eliminar status por ID
+curl -i -X DELETE http://localhost:8080/statuses/1
+
+# Eliminar castmember por ID
+curl -i -X DELETE http://localhost:8080/castmembers/1

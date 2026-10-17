@@ -81,6 +81,12 @@ maketest-stop:
 	@docker compose down >/dev/null 2>&1
 	@echo "=== Finalizado ==="
 
+# Borra los volúmenes de la base de datos para empezar de cero
+cleanDB:
+	@echo "\n=== Limpiando Base de Datos (volúmenes) ==="
+	@docker compose down -v >/dev/null 2>&1
+	@echo "=== Base de Datos Limpia ==="
+
 
 help:
 	@echo "Posibles Comandos:"
@@ -92,6 +98,7 @@ help:
 	@echo "  buildDocker      Construye las imágenes de Docker"
 	@echo "  downDocker       Frena los contenedores"
 	@echo "  cleanVolumenes   Frena los contenedores y limpia los volúmenes"
+	@echo "  cleanDB          Frena los contenedores y borra los volúmenes de la BD"
 	@echo "  clean            Elimina el binario y los archivos temporales"
 	@echo "  rebuild          Detiene y reconstruye los contenedores desde cero"
 	@echo "  check-sqlc       Verifica si el código está generado y ejecuta sqlc generate si no lo está"
