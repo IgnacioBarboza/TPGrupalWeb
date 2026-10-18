@@ -5,7 +5,7 @@
 APP_NAME := app
 SQLC_GENERATED := $(shell ls ./db/sqlc 2>/dev/null || echo "")
 
-# Chequea si esta esta generado sqlc, sino lo genera
+# Chequea si está generado sqlc, sino lo genera
 check-sqlc:
 	@if [ -z "$(SQLC_GENERATED)" ]; then \
 		echo "Generando SQLC"; \
@@ -14,74 +14,79 @@ check-sqlc:
 		echo "sqlc ya fue ejecutado"; \
 	fi
 
+# Elimina el código generado por sqlc
 delete-sqlc:
 	@echo "DEBUG delete-sqlc"
 	rm -rf db/sqlc
 
-# Ejecuta install-sqlc y luego check-sqlc
-generatesqlc: delete-sqlc check-sqlc
-	@echo "DEBUG generatesqlc terminado"
+# Elimina sqlc anterior y lo regenera desde cero
+generatesqlc: delete-sqlc 
+	@echo "Sqlc anterior eliminado"
+	@make check-sqlc
+	@echo "Nuevo sqlc generado"
 
-# Hacer testeos (rm = borrar luego de ejecutar)
+# Ejecuta los tests de Go en el contenedor (se borra al terminar)
 test:
 	@echo "DEBUG Testeo"
 	docker compose run --rm api go test -v
 
-# Empieza el container
+# Levanta los contenedores en segundo plano
 upDocker:
 	@echo "DEBUG upDocker"
 	docker compose up -d
 
+# Construye las imágenes de Docker
 buildDocker:
 	@echo "DEBUG buildDocker"
 	docker compose build
 
-# Frena el container
+# Frena y elimina los contenedores
 downDocker:
 	@echo "DEBUG downDocker"
 	docker compose down
 
-# Limpiar volumenes
+# Frena los contenedores y elimina los volúmenes
 cleanVolumenes:
 	@echo "DEBUG cleanVolumenes"
 	docker compose down -v
 
-# Limpiar archivos
+# Elimina el binario y archivos temporales
 clean:
 	@echo "DEBUG clean"
 	rm -f $(APP_NAME)
 	rm -rf tmp/
 
-# Baja el container y lo re-construye
+# Baja los contenedores y los reconstruye
 rebuild: downDocker
 	@echo "DEBUG rebuild"
 	docker compose up -d --build    
 
-# Copiamos las variables de entorno
+# Copia las variables de entorno de ejemplo
 copyEnv:
 	cp .env.example .env
 
-# Limpia lo viejo, construye, levanta, testea y limpia
-start: copyEnv cleanVolumenes generatesqlc buildDocker upDocker
-	@echo "Ejecutando tests..."
-	make test
-	@echo "Tests exitosos, procediendo a limpiar..."
-	make cleanVolumenes
-	make clean
-	@echo "DEBUG start completado"
+# Limpia la BD, regenera sqlc, levanta Docker, corre requests.bash y apaga
+start: copyEnv generatesqlc cleanDB
+	@echo "Limpiando e iniciando Docker"
+	@docker compose up --build -d
+	@echo "Ejecutando batch de testing de Curls"
+	@./requests.bash
+	@echo "Testeos finalizados"
+	@echo "Limpiando y apagando"
+	@docker compose down >/dev/null 2>&1
 
-# Levanta la base de datos
-maketest-start: copyEnv check-sqlc
+# Levanta el servidor en primer plano para pruebas manuales
+StartServer: copyEnv check-sqlc
 	@echo "\n=== Iniciando Servidor de Pruebas ==="
 	@docker compose up --build 
 
-# Frena el servidor y limpia los volúmenes
-maketest-stop:
-	@echo "\n=== Apagando y Limpiando ==="
+# Frena el servidor sin borrar los datos de la BD
+StopServer:
+	@echo "\n=== Apagando Servidor ==="
 	@docker compose down >/dev/null 2>&1
 	@echo "=== Finalizado ==="
 
-# Borra los volúmenes de la base de datos para empezar de cero
+# Frena el servidor y borra los volúmenes de la BD para empezar de cero
 cleanDB:
 	@echo "\n=== Limpiando Base de Datos (volúmenes) ==="
 	@docker compose down -v >/dev/null 2>&1
@@ -91,17 +96,19 @@ cleanDB:
 help:
 	@echo "Posibles Comandos:"
 	@echo ""
-	@echo "  help             Muestra este mensaje de ayuda"
-	@echo "  start            Construye, levanta el contenedor y ejecuta los tests"
-	@echo "  test             Ejecuta los tests dentro del contenedor (se borra al terminar)"
-	@echo "  upDocker         Inicia los contenedores"
-	@echo "  buildDocker      Construye las imágenes de Docker"
+	@echo "  help             Muestra esta ayuda"
+	@echo "  start            Limpia BD, levanta Docker, corre requests.bash y apaga"
+	@echo "  StartServer      Levanta el servidor para pruebas manuales"
+	@echo "  StopServer       Frena el servidor (conserva datos de la BD)"
+	@echo "  cleanDB          Frena el servidor y borra los datos de la BD"
+	@echo "  test             Ejecuta 'go test' dentro del contenedor"
+	@echo "  upDocker         Inicia los contenedores en segundo plano"
 	@echo "  downDocker       Frena los contenedores"
-	@echo "  cleanVolumenes   Frena los contenedores y limpia los volúmenes"
-	@echo "  cleanDB          Frena los contenedores y borra los volúmenes de la BD"
-	@echo "  clean            Elimina el binario y los archivos temporales"
-	@echo "  rebuild          Detiene y reconstruye los contenedores desde cero"
-	@echo "  check-sqlc       Verifica si el código está generado y ejecuta sqlc generate si no lo está"
-	@echo "  install-sqlc     Instala sqlc en tu sistema si no lo tenés"
-	@echo "  generatesqlc     Instala sqlc (si hace falta) y genera el código"
+	@echo "  buildDocker      Construye las imágenes de Docker"
+	@echo "  rebuild          Reconstruye y levanta los contenedores"
+	@echo "  check-sqlc       Genera el código de sqlc si no existe"
+	@echo "  generatesqlc     Borra y regenera el código de sqlc"
+	@echo "  delete-sqlc      Elimina la carpeta db/sqlc"
+	@echo "  copyEnv          Copia .env.example a .env"
+	@echo "  clean            Elimina binarios y temporales locales"
 	@echo ""

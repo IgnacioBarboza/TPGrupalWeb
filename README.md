@@ -1,8 +1,10 @@
 # TPGrupalWeb
 
-TP de la cátedra Programación Web (UNICEN) — API en Go para gestionar una base de datos de películas: usuarios, films, géneros, reparto, reviews y el estado de visualización de cada usuario por película.
+## Introducción
 
-El objetivo del TP es preparar la capa de acceso a la base de datos y realizar testeos.
+TP de la cátedra Programación Web (UNICEN) — API REST HTTP en Go (sobre `:8080`) para gestionar una base de datos de películas: usuarios, films, géneros, reparto, reviews y el estado de visualización de cada usuario por película.
+
+El objetivo del TP es exponer las operaciones CRUD de todas las entidades y relaciones a través de endpoints HTTP estructurados en capas (`handler`, `service`, `repository` y `errors`), junto con su suite de pruebas.
 
 ## Modelo de entidades
 
@@ -15,12 +17,22 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 ```
 .
 ├── db/
-│   ├── schema/       # DDL de las tablas (Postgres)
-│   ├── queries/       # Queries .sql usadas por sqlc
-│   └── sqlc/          # Código Go que se te va a generar
-├── static/             # Archivos estáticos servidos por la API
-├── CRUDSimple_test.go     # Tests de CRUD simple (Film, User, Genre, Status, CastMember)
-├── CRUDCompuesto_test.go  # Tests de CRUD sobre relaciones (Review, FilmCast, FilmGenre, FilmUserStatus)
+│   ├── schema/                # DDL de las tablas (Postgres)
+│   ├── queries/               # Queries .sql usadas por sqlc
+│   └── sqlc/                  # Código Go generado por sqlc
+├── internal/                  # Lógica de la API dividida en capas (handler, service, repository, errors)
+│   ├── film/                  # Endpoints /films y /films/{id}
+│   ├── user/                  # Endpoints /users y /users/{id}
+│   ├── genre/                 # Endpoints /genres y /genres/{id}
+│   ├── status/                # Endpoints /statuses y /statuses/{id}
+│   ├── castmember/            # Endpoints /castmembers y /castmembers/{id}
+│   ├── review/                # Endpoints /reviews y /reviews/{filmID}/{userID}
+│   ├── filmcast/              # Endpoints /filmcasts y /filmcasts/{filmID}/{castMemberID}
+│   ├── filmgenre/             # Endpoints /filmgenres y /filmgenres/{genreID}/{filmID}
+│   └── filmuserstatus/        # Endpoints /filmuserstatuses y /filmuserstatuses/{filmID}/{userID}
+├── CRUDSimple_test.go         # Tests de BD para CRUD simple (Film, User, Genre, Status, CastMember)
+├── CRUDCompuesto_test.go      # Tests de BD para relaciones (Review, FilmCast, FilmGenre, FilmUserStatus)
+├── requests.bash              # Script de prueba integral de todos los endpoints HTTP con curl
 ├── Dockerfile
 ├── docker-compose.yml
 ├── Makefile
@@ -31,35 +43,30 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 
 ## Requisitos
 
-- Go 1.25+
+- Go 1.26+
 - Docker y Docker Compose
 - sqlc
+- `curl` y `bash` (para ejecutar `./requests.bash`)
 
 ## Setup
 
-1. Clonar el repositorio y hacer checkout sobre el branch correcto (tp2):
+1. Clonar el repositorio y hacer checkout sobre el branch correcto (`tp3`):
 
 ```bash
    git clone https://github.com/IgnacioBarboza/TPGrupalWeb/
    cd TPGrupalWeb
-   git checkout tp2
+   git checkout tp3
 ```
 
-1. Copiar el archivo de variables de entorno de ejemplo y completarlo:
-
-```bash
-   cp .env.example .env
-```
-
-2. Levantar todo (build + up + tests) con un solo comando:
+2. Levantar todo, ejecutar el batch de pruebas HTTP y apagar con un solo comando (copia automáticamente `.env.example` a `.env`):
 
 ```bash
    make start
 ```
 
-Esto limpia volúmenes viejos, genera el código de sqlc si falta, construye las imágenes, levanta los contenedores, corre los tests, y limpia todo al final. **Es el comando que se debe utilizar para probar el trabajo**
+Esto copia `.env`, regenera el código de `sqlc`, limpia los volúmenes de la base de datos, construye y levanta los contenedores en segundo plano, ejecuta todas las pruebas HTTP con `./requests.bash` y apaga los contenedores al finalizar.
 
-Los comandos se manejan con make:
+Para ver todos los comandos disponibles:
 
 ```bash
 make help
@@ -67,20 +74,35 @@ make help
 
 Los más usados:
 
-| Comando                 | Qué hace                                                   |
-| ----------------------- | ---------------------------------------------------------- |
-| **make start**          | Build + up + test + limpieza, todo en un paso (quickstart) |
-| **make upDocker**       | Levanta los contenedores (api + database)                  |
-| **make downDocker**     | Frena los contenedores                                     |
-| **make test**           | Corre los tests dentro del contenedor                      |
-| **make rebuild**        | Frena y reconstruye los contenedores desde cero            |
-| **make cleanVolumenes** | Frena los contenedores y borra los volúmenes de Postgres   |
-| **make generatesqlc**   | Instala sqlc (si falta) y genera el código en db/sqlc/     |
+| Comando               | Qué hace                                                              |
+| --------------------- | --------------------------------------------------------------------- |
+| **make start**        | Limpia BD, levanta Docker, corre `requests.bash` y apaga (all-in-one) |
+| **make StartServer**  | Levanta el servidor en primer plano para pruebas manuales             |
+| **make StopServer**   | Frena el servidor conservando los datos de la BD                      |
+| **make cleanDB**      | Frena el servidor y borra los volúmenes de la BD (reinicia IDs)       |
+| **make test**         | Ejecuta `go test` dentro del contenedor                               |
+| **make upDocker**     | Inicia los contenedores en segundo plano                              |
+| **make downDocker**   | Frena los contenedores                                                |
+| **make rebuild**      | Reconstruye y levanta los contenedores                                |
+| **make generatesqlc** | Borra y regenera el código de `sqlc` en `db/sqlc/`                    |
 
 ## Tests
 
-**ESTO SE ENCUENTRA INCLUIDO DENTRO DEL MAKE START, NO EJECUTAR DE MANERA AISLADA** <br>
-Los tests se corren dentro del contenedor de la API, para no depender de tener Go o Postgres instalados localmente:
+El proyecto cuenta con dos tipos de pruebas:
+
+### 1. Pruebas de Endpoints HTTP (`requests.bash`) — _Incluidas en `make start`_
+
+Prueba el conjunto completo de "curl" (`POST` unitario, `POST` masivo, `GET` colección, `GET` por ID/clave compuesta, `PUT` y `DELETE`) sobre las 9 entidades de la API en `http://localhost:8080`, informando y contando si hubo algún error HTTP (`4xx`/`5xx`).
+
+Si tenés el servidor levantado con `make StartServer`, también podés correrlo manualmente:
+
+```bash
+./requests.bash
+```
+
+### 2. Tests de capa de datos en Go (`go test`)
+
+Prueban directamente las consultas de `sqlc` contra Postgres dentro del contenedor (con los contenedores levantados):
 
 ```bash
 make test
@@ -88,5 +110,5 @@ make test
 
 Están separados en dos archivos:
 
-- **CRUDSimple_test.go**: CRUD de entidades sin relaciones compuestas (Film, User, Genre, Status, CastMember).
-- **CRUDCompuesto_test.go**: CRUD sobre las tablas de relación (Review, FilmCast, FilmGenre, FilmUserStatus), que dependen de las entidades simples para poder crearse.
+- **CRUDSimple_test.go**: CRUD de entidades con clave simple (`Film`, `User`, `Genre`, `Status`, `CastMember`).
+- **CRUDCompuesto_test.go**: CRUD sobre las tablas de relación con clave compuesta (`Review`, `FilmCast`, `FilmGenre`, `FilmUserStatus`).

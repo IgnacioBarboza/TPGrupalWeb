@@ -4,9 +4,43 @@
 # Prueba: Crear (POST), Listar (GET), Ver (GET por ID/clave), Actualizar (PUT) y Eliminar (DELETE)
 # ==============================================================================
 
-set -e
-
 BASE_URL="http://localhost:8080"
+
+# INICIO CAMBIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+ERROR_LOG_FILE=$(mktemp)
+trap 'rm -f "$ERROR_LOG_FILE"' EXIT
+
+# Wrapper de curl para contar y registrar cualquier error (fallo de conexión o HTTP >= 400)
+curl() {
+  local tmp_headers
+  tmp_headers=$(mktemp)
+  local exit_code=0
+  command curl -D "$tmp_headers" "$@" || exit_code=$?
+
+  local http_code
+  http_code=$(awk '/^HTTP\// {code=$2} END {print code}' "$tmp_headers" | tr -d '\r')
+  rm -f "$tmp_headers"
+
+  if [ "$exit_code" -ne 0 ] || [ -z "$http_code" ] || [ "$http_code" -ge 400 ] 2>/dev/null; then
+    local method="GET"
+    local url=""
+    local prev=""
+    for arg in "$@"; do
+      if [ "$prev" = "-X" ]; then
+        method="$arg"
+      fi
+      case "$arg" in
+        http://*|https://*) url="$arg" ;;
+      esac
+      prev="$arg"
+    done
+    echo "HTTP ${http_code:-ERR_CONN} [$method $url]" >> "$ERROR_LOG_FILE"
+  fi
+  return 0
+}
+
+# FIN CAMBIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
 
 # Helper para extraer IDs de JSON sin requerir dependencias externas complejas
 extract_id() {
@@ -315,7 +349,24 @@ curl -s -i -X DELETE "$BASE_URL/genres/$GENRE_ID" | head -n 1
 echo "DELETE /statuses/$STATUS_ID"
 curl -s -i -X DELETE "$BASE_URL/statuses/$STATUS_ID" | head -n 1
 
-echo -e "\n===================================================================="
-echo "    TODAS LAS PRUEBAS DE LA API SE COMPLETARON EXITOSAMENTE"
-echo "===================================================================="
 
+# INICIO CAMBIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
+echo -e "\n===================================================================="
+ERROR_COUNT=$(wc -l < "$ERROR_LOG_FILE" | tr -d ' ')
+echo "    CANTIDAD DE ERRORES DETECTADOS: $ERROR_COUNT"
+if [ "$ERROR_COUNT" -gt 0 ]; then
+  echo "--------------------------------------------------------------------"
+  echo "    DETALLE DE ERRORES:"
+  while IFS= read -r line; do
+    echo "      - $line"
+  done < "$ERROR_LOG_FILE"
+  echo "===================================================================="
+  exit 1
+else
+  echo "    TODAS LAS PRUEBAS DE LA API SE COMPLETARON EXITOSAMENTE"
+  echo "===================================================================="
+fi
+
+
+# FIN CAMBIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
