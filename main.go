@@ -4,6 +4,10 @@ import (
 	db "WebGrupal/db/sqlc"
 	CastMember "WebGrupal/internal/castmember"
 	film "WebGrupal/internal/film"
+	FilmCast "WebGrupal/internal/filmcast"
+	FilmGenre "WebGrupal/internal/filmgenre"
+	FilmUserStatus "WebGrupal/internal/filmuserstatus"
+	Genre "WebGrupal/internal/genre"
 	Review "WebGrupal/internal/review"
 	Status "WebGrupal/internal/status"
 	User "WebGrupal/internal/user"
@@ -56,6 +60,10 @@ var reviewHandler *Review.ReviewHandler
 var userHandler *User.UserHandler
 var statusHandler *Status.StatusHandler
 var castMemberHandler *CastMember.CastMemberHandler
+var genreHandler *Genre.GenreHandler
+var filmCastHandler *FilmCast.FilmCastHandler
+var filmGenreHandler *FilmGenre.FilmGenreHandler
+var filmUserStatusHandler *FilmUserStatus.FilmUserStatusHandler
 
 func initializeServices() {
 	conn := OpenDB()
@@ -81,6 +89,22 @@ func initializeServices() {
 	castMemberRepo := CastMember.NewSQLCRepository(queries)
 	castMemberSvc := CastMember.NewCastMemberService(castMemberRepo)
 	castMemberHandler = CastMember.NewCastMemberHandler(castMemberSvc)
+
+	genreRepo := Genre.NewSQLCRepository(queries)
+	genreSvc := Genre.NewGenreService(genreRepo)
+	genreHandler = Genre.NewGenreHandler(genreSvc)
+
+	filmCastRepo := FilmCast.NewSQLCRepository(queries)
+	filmCastSvc := FilmCast.NewFilmCastService(filmCastRepo)
+	filmCastHandler = FilmCast.NewFilmCastHandler(filmCastSvc)
+
+	filmGenreRepo := FilmGenre.NewSQLCRepository(queries)
+	filmGenreSvc := FilmGenre.NewFilmGenreService(filmGenreRepo)
+	filmGenreHandler = FilmGenre.NewFilmGenreHandler(filmGenreSvc)
+
+	filmUserStatusRepo := FilmUserStatus.NewSQLCRepository(queries)
+	filmUserStatusSvc := FilmUserStatus.NewFilmUserStatusService(filmUserStatusRepo)
+	filmUserStatusHandler = FilmUserStatus.NewFilmUserStatusHandler(filmUserStatusSvc)
 }
 
 func main() {
@@ -91,6 +115,10 @@ func main() {
 	userHandler.Register(mux)
 	statusHandler.Register(mux)
 	castMemberHandler.Register(mux)
+	genreHandler.Register(mux)
+	filmCastHandler.Register(mux)
+	filmGenreHandler.Register(mux)
+	filmUserStatusHandler.Register(mux)
 
 	log.Println("Escuchando en :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
