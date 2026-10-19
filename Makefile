@@ -68,7 +68,7 @@ copyEnv:
 # Limpia la BD, regenera sqlc, levanta Docker, corre requests.bash y apaga
 start: copyEnv generatesqlc cleanDB
 	@echo "Limpiando e iniciando Docker"
-	@docker compose up --build -d
+	@docker compose up --build -d 
 	@echo "Ejecutando batch de testing de Curls"
 	@./requests.bash
 	@echo "Testeos finalizados"
