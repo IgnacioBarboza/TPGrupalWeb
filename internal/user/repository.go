@@ -10,6 +10,7 @@ package User
 // Imports
 import (
 	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 	"database/sql"
 	"errors"
@@ -18,11 +19,11 @@ import (
 
 // Interfaz
 type UserRepository interface {
-	GetUser(ctx context.Context, id int32) (db.User, error)
-	GetUsers(ctx context.Context) ([]db.User, error)
-	Create(ctx context.Context, user db.User) (db.User, error)
+	GetUser(ctx context.Context, id int32) (dto.User, error)
+	GetUsers(ctx context.Context) ([]dto.User, error)
+	Create(ctx context.Context, user dto.User) (dto.User, error)
 	Delete(ctx context.Context, id int32) error
-	Update(ctx context.Context, user db.User) (db.User, error)
+	Update(ctx context.Context, user dto.User) (dto.User, error)
 }
 
 type SQLCRepository struct {
@@ -36,30 +37,30 @@ func NewSQLCRepository(q *db.Queries) *SQLCRepository {
 
 // A partir de aca, implementaciones:
 
-func (r *SQLCRepository) GetUser(ctx context.Context, id int32) (db.User, error) {
+func (r *SQLCRepository) GetUser(ctx context.Context, id int32) (dto.User, error) {
 	u, err := r.queries.GetUser(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return db.User{}, ErrUserNotFound
+			return dto.User{}, ErrUserNotFound
 		}
-		return db.User{}, fmt.Errorf("consultar user %d: %w", id, err)
+		return dto.User{}, fmt.Errorf("consultar user %d: %w", id, err)
 	}
-	return u, nil
+	return dto.User(u), nil
 }
 
-func (r *SQLCRepository) GetUsers(ctx context.Context) ([]db.User, error) {
+func (r *SQLCRepository) GetUsers(ctx context.Context) ([]dto.User, error) {
 	rows, err := r.queries.GetUsers(ctx)
 	if err != nil {
 		return nil, err
 	}
-	users := make([]db.User, 0, len(rows))
+	users := make([]dto.User, 0, len(rows))
 	for _, u := range rows {
-		users = append(users, u)
+		users = append(users, dto.User(u))
 	}
 	return users, nil
 }
 
-func (r *SQLCRepository) Create(ctx context.Context, user db.User) (db.User, error) {
+func (r *SQLCRepository) Create(ctx context.Context, user dto.User) (dto.User, error) {
 	u, err := r.queries.CreateUser(ctx, db.CreateUserParams{
 		Username:           user.Username,
 		Userpasswordhashed: user.Userpasswordhashed,
@@ -67,16 +68,16 @@ func (r *SQLCRepository) Create(ctx context.Context, user db.User) (db.User, err
 		Usergenre:          user.Usergenre,
 	})
 	if err != nil {
-		return db.User{}, err
+		return dto.User{}, err
 	}
-	return u, nil
+	return dto.User(u), nil
 }
 
 func (r *SQLCRepository) Delete(ctx context.Context, id int32) error {
 	return r.queries.DeleteUser(ctx, id)
 }
 
-func (r *SQLCRepository) Update(ctx context.Context, user db.User) (db.User, error) {
+func (r *SQLCRepository) Update(ctx context.Context, user dto.User) (dto.User, error) {
 	err := r.queries.UpdateUser(ctx, db.UpdateUserParams{
 		Userid:             user.Userid,
 		Username:           user.Username,
@@ -85,8 +86,7 @@ func (r *SQLCRepository) Update(ctx context.Context, user db.User) (db.User, err
 		Usergenre:          user.Usergenre,
 	})
 	if err != nil {
-		return db.User{}, err
+		return dto.User{}, err
 	}
 	return r.GetUser(ctx, user.Userid)
 }
-

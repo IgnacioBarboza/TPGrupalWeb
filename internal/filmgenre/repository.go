@@ -10,6 +10,7 @@ package FilmGenre
 // Imports
 import (
 	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 	"database/sql"
 	"errors"
@@ -19,9 +20,9 @@ import (
 // Interfaz
 // FilmGenre es una tabla de union sin campos propios, por lo que no tiene operacion Update.
 type FilmGenreRepository interface {
-	GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (db.Filmgenre, error)
-	GetFilmGenres(ctx context.Context) ([]db.Filmgenre, error)
-	Create(ctx context.Context, filmGenre db.Filmgenre) (db.Filmgenre, error)
+	GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (dto.Filmgenre, error)
+	GetFilmGenres(ctx context.Context) ([]dto.Filmgenre, error)
+	Create(ctx context.Context, filmGenre dto.Filmgenre) (dto.Filmgenre, error)
 	Delete(ctx context.Context, genreID int32, filmID int32) error
 }
 
@@ -36,41 +37,41 @@ func NewSQLCRepository(q *db.Queries) *SQLCRepository {
 
 // A partir de aca, implementaciones:
 
-func (r *SQLCRepository) GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (db.Filmgenre, error) {
+func (r *SQLCRepository) GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (dto.Filmgenre, error) {
 	fg, err := r.queries.GetFilmGenre(ctx, db.GetFilmGenreParams{
 		GenreGenreid: genreID,
 		FilmFilmid:   filmID,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return db.Filmgenre{}, ErrFilmGenreNotFound
+			return dto.Filmgenre{}, ErrFilmGenreNotFound
 		}
-		return db.Filmgenre{}, fmt.Errorf("consultar filmgenre genre=%d film=%d: %w", genreID, filmID, err)
+		return dto.Filmgenre{}, fmt.Errorf("consultar filmgenre genre=%d film=%d: %w", genreID, filmID, err)
 	}
-	return fg, nil
+	return dto.Filmgenre(fg), nil
 }
 
-func (r *SQLCRepository) GetFilmGenres(ctx context.Context) ([]db.Filmgenre, error) {
+func (r *SQLCRepository) GetFilmGenres(ctx context.Context) ([]dto.Filmgenre, error) {
 	rows, err := r.queries.GetFilmGenres(ctx)
 	if err != nil {
 		return nil, err
 	}
-	filmGenres := make([]db.Filmgenre, 0, len(rows))
+	filmGenres := make([]dto.Filmgenre, 0, len(rows))
 	for _, fg := range rows {
-		filmGenres = append(filmGenres, fg)
+		filmGenres = append(filmGenres, dto.Filmgenre(fg))
 	}
 	return filmGenres, nil
 }
 
-func (r *SQLCRepository) Create(ctx context.Context, filmGenre db.Filmgenre) (db.Filmgenre, error) {
+func (r *SQLCRepository) Create(ctx context.Context, filmGenre dto.Filmgenre) (dto.Filmgenre, error) {
 	fg, err := r.queries.CreateFilmGenre(ctx, db.CreateFilmGenreParams{
 		GenreGenreid: filmGenre.GenreGenreid,
 		FilmFilmid:   filmGenre.FilmFilmid,
 	})
 	if err != nil {
-		return db.Filmgenre{}, err
+		return dto.Filmgenre{}, err
 	}
-	return fg, nil
+	return dto.Filmgenre(fg), nil
 }
 
 func (r *SQLCRepository) Delete(ctx context.Context, genreID int32, filmID int32) error {
@@ -79,4 +80,3 @@ func (r *SQLCRepository) Delete(ctx context.Context, genreID int32, filmID int32
 		FilmFilmid:   filmID,
 	})
 }
-

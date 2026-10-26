@@ -1,7 +1,7 @@
 package User
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -98,7 +98,7 @@ func (h *UserHandler) getUser(w http.ResponseWriter, r *http.Request, id int32) 
 
 // PUT /users/{id}: Recibe datos JSON, los valida, y actualiza el registro correspondiente.
 func (h *UserHandler) updateUser(w http.ResponseWriter, r *http.Request, id int32) {
-	var receivedUser db.User
+	var receivedUser dto.User
 	if err := json.NewDecoder(r.Body).Decode(&receivedUser); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -147,7 +147,7 @@ func (h *UserHandler) getUsers(w http.ResponseWriter, r *http.Request) {
 
 // POST /users: Recibe datos en formato JSON (array), los valida y crea múltiples users.
 func (h *UserHandler) createMultipleUsers(w http.ResponseWriter, r *http.Request) {
-	var users []db.User
+	var users []dto.User
 	if err := json.NewDecoder(r.Body).Decode(&users); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -173,7 +173,7 @@ func (h *UserHandler) deleteUser(w http.ResponseWriter, r *http.Request, id int3
 }
 
 func (h *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
-	var receivedUser db.User
+	var receivedUser dto.User
 	if err := json.NewDecoder(r.Body).Decode(&receivedUser); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -187,4 +187,3 @@ func (h *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusCreated, createdUser) // 201 (statusCreated)
 }
-

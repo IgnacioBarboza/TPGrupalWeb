@@ -9,7 +9,7 @@ package Status
 
 // Imports
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 )
 
@@ -21,40 +21,40 @@ func NewStatusService(repo StatusRepository) *StatusService {
 	return &StatusService{repo: repo}
 }
 
-func (s *StatusService) GetStatus(ctx context.Context, id int32) (db.Status, error) {
+func (s *StatusService) GetStatus(ctx context.Context, id int32) (dto.Status, error) {
 	st, err := s.repo.GetStatus(ctx, id)
 
 	if err != nil {
-		return db.Status{}, err
+		return dto.Status{}, err
 	}
 
 	// EJEMPLO DE REGLA DE NEGOCIO
 	if st.Statusid < 0 {
-		return db.Status{}, ErrInvalidStatusID
+		return dto.Status{}, ErrInvalidStatusID
 	}
 	return st, nil
 }
 
-func (s *StatusService) GetStatuses(ctx context.Context) ([]db.Status, error) {
+func (s *StatusService) GetStatuses(ctx context.Context) ([]dto.Status, error) {
 	return s.repo.GetStatuses(ctx)
 }
 
-func (s *StatusService) Create(ctx context.Context, status db.Status) (db.Status, error) {
+func (s *StatusService) Create(ctx context.Context, status dto.Status) (dto.Status, error) {
 	if err := validateStatus(status); err != nil {
-		return db.Status{}, err
+		return dto.Status{}, err
 	}
 	return s.repo.Create(ctx, status)
 }
 
 // validateStatus aplica las reglas de negocio comunes a Create y Update.
-func validateStatus(status db.Status) error {
+func validateStatus(status dto.Status) error {
 	if status.Statusname == "" {
 		return ErrInvalidStatusNameEmpty
 	}
 	return nil
 }
 
-func (s *StatusService) CreateMultipleStatuses(ctx context.Context, statuses []db.Status) ([]db.Status, error) {
+func (s *StatusService) CreateMultipleStatuses(ctx context.Context, statuses []dto.Status) ([]dto.Status, error) {
 	if len(statuses) == 0 {
 		return nil, ErrInvalidStatus
 	}
@@ -65,7 +65,7 @@ func (s *StatusService) CreateMultipleStatuses(ctx context.Context, statuses []d
 		}
 	}
 
-	created := make([]db.Status, 0, len(statuses))
+	created := make([]dto.Status, 0, len(statuses))
 	for _, status := range statuses {
 		c, err := s.repo.Create(ctx, status)
 		if err != nil {
@@ -80,10 +80,9 @@ func (s *StatusService) Delete(ctx context.Context, id int32) error {
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *StatusService) Update(ctx context.Context, status db.Status) (db.Status, error) {
+func (s *StatusService) Update(ctx context.Context, status dto.Status) (dto.Status, error) {
 	if err := validateStatus(status); err != nil {
-		return db.Status{}, err
+		return dto.Status{}, err
 	}
 	return s.repo.Update(ctx, status)
 }
-

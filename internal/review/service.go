@@ -9,7 +9,7 @@ package Review
 
 // Imports
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 )
 
@@ -21,22 +21,22 @@ func NewReviewService(repo ReviewRepository) *ReviewService {
 	return &ReviewService{repo: repo}
 }
 
-func (s *ReviewService) GetReview(ctx context.Context, filmID int32, userID int32) (db.Review, error) {
+func (s *ReviewService) GetReview(ctx context.Context, filmID int32, userID int32) (dto.Review, error) {
 	return s.repo.GetReview(ctx, filmID, userID)
 }
 
-func (s *ReviewService) GetReviews(ctx context.Context) ([]db.Review, error) {
+func (s *ReviewService) GetReviews(ctx context.Context) ([]dto.Review, error) {
 	return s.repo.GetReviews(ctx)
 }
 
-func (s *ReviewService) Create(ctx context.Context, review db.Review) (db.Review, error) {
+func (s *ReviewService) Create(ctx context.Context, review dto.Review) (dto.Review, error) {
 	if err := validateReview(review); err != nil {
-		return db.Review{}, err
+		return dto.Review{}, err
 	}
 	return s.repo.Create(ctx, review) // @Nachito aca para crear no se si te pinta buscar que los dos ids existan en la base de datos, sino no tiene sentido crear un review para un film que no existe o un usuario que no existe, pero capaz es mucho quilombo.
 }
 
-func (s *ReviewService) CreateMultipleReviews(ctx context.Context, reviews []db.Review) ([]db.Review, error) {
+func (s *ReviewService) CreateMultipleReviews(ctx context.Context, reviews []dto.Review) ([]dto.Review, error) {
 	if len(reviews) == 0 {
 		return nil, ErrInvalidReview
 	}
@@ -47,7 +47,7 @@ func (s *ReviewService) CreateMultipleReviews(ctx context.Context, reviews []db.
 		}
 	}
 
-	created := make([]db.Review, 0, len(reviews))
+	created := make([]dto.Review, 0, len(reviews))
 	for _, review := range reviews {
 		c, err := s.repo.Create(ctx, review)
 		if err != nil {
@@ -62,15 +62,15 @@ func (s *ReviewService) Delete(ctx context.Context, filmID int32, userID int32) 
 	return s.repo.Delete(ctx, filmID, userID)
 }
 
-func (s *ReviewService) Update(ctx context.Context, review db.Review) (db.Review, error) {
+func (s *ReviewService) Update(ctx context.Context, review dto.Review) (dto.Review, error) {
 	if err := validateReview(review); err != nil {
-		return db.Review{}, err
+		return dto.Review{}, err
 	}
 	return s.repo.Update(ctx, review)
 }
 
 // validateReview aplica las reglas de negocio comunes a Create y Update.
-func validateReview(review db.Review) error {
+func validateReview(review dto.Review) error {
 	if review.Reviewdescription == "" {
 		return ErrInvalidReviewDescriptionEmpty
 	}
@@ -79,4 +79,3 @@ func validateReview(review db.Review) error {
 	}
 	return nil
 }
-

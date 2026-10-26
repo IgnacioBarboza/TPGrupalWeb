@@ -1,0 +1,168 @@
+package views
+
+import (
+	dto "WebGrupal/internal"
+	"fmt"
+)
+
+// 1. FILM LIST
+templ FilmList(films []dto.Film) {
+	<ul id="list-films">
+		if len(films) == 0 {
+			<li>No hay películas cargadas.</li>
+		} else {
+			for _, film := range films {
+				<li>
+					<span>
+						{ fmt.Sprintf("[ID: %d] %s - Estreno: %s - Duración: %d min", film.Filmid, film.Filmtitle, film.Filmreleasedate.Format("2006-01-02"), film.Filmduration) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 2. GENRE LIST
+templ GenreList(genres []dto.Genre) {
+	<ul id="list-genres">
+		if len(genres) == 0 {
+			<li>No hay géneros cargados.</li>
+		} else {
+			for _, genre := range genres {
+				<li>
+					<span>
+						{ fmt.Sprintf("[ID: %d] %s", genre.Genreid, genre.Genrename) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 3. CAST MEMBER LIST
+templ CastMemberList(castMembers []dto.Castmember) {
+	<ul id="list-castmembers">
+		if len(castMembers) == 0 {
+			<li>No hay miembros del elenco cargados.</li>
+		} else {
+			for _, cm := range castMembers {
+				<li>
+					<span>
+						{ fmt.Sprintf("[ID: %d] %s - Rol: %s - Género: %s", cm.Castmemberid, cm.Castmembername, cm.Castmemberrole, cm.Castmembergender) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 4. STATUS LIST
+templ StatusList(statuses []dto.Status) {
+	<ul id="list-statuses">
+		if len(statuses) == 0 {
+			<li>No hay estados cargados.</li>
+		} else {
+			for _, st := range statuses {
+				<li>
+					<span>
+						{ fmt.Sprintf("[ID: %d] %s", st.Statusid, st.Statusname) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 5. USER LIST
+templ UserList(users []dto.User) {
+	<ul id="list-users">
+		if len(users) == 0 {
+			<li>No hay usuarios cargados.</li>
+		} else {
+			for _, u := range users {
+				<li>
+					<span>
+						{ fmt.Sprintf("[ID: %d] %s - Nacimiento: %s - Género: %s", u.Userid, u.Username, u.Userbirthday.Format("2006-01-02"), u.Usergenre) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 6. REVIEW LIST
+templ ReviewList(reviews []dto.Review) {
+	<ul id="list-reviews">
+		if len(reviews) == 0 {
+			<li>No hay reseñas cargadas.</li>
+		} else {
+			for _, rev := range reviews {
+				<li>
+					<span>
+						{ fmt.Sprintf("[Película ID: %d | Usuario ID: %d] %d★ - %q", rev.Reviewfilmid, rev.Reviewuserid, rev.Reviewstars, rev.Reviewdescription) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 7. FILM CAST LIST
+templ FilmCastList(filmCasts []dto.Filmcast) {
+	<ul id="list-filmcasts">
+		if len(filmCasts) == 0 {
+			<li>No hay relaciones FilmCast cargadas.</li>
+		} else {
+			for _, fc := range filmCasts {
+				<li>
+					<span>
+						{ fmt.Sprintf("Película ID: %d ↔ Miembro Elenco ID: %d", fc.Filmid, fc.Castmemberid) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 8. FILM GENRE LIST
+templ FilmGenreList(filmGenres []dto.Filmgenre) {
+	<ul id="list-filmgenres">
+		if len(filmGenres) == 0 {
+			<li>No hay relaciones FilmGenre cargadas.</li>
+		} else {
+			for _, fg := range filmGenres {
+				<li>
+					<span>
+						{ fmt.Sprintf("Género ID: %d ↔ Película ID: %d", fg.GenreGenreid, fg.FilmFilmid) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}
+
+// 9. FILM USER STATUS LIST
+templ FilmUserStatusList(statuses []dto.Filmuserstatus) {
+	<ul id="list-filmuserstatuses">
+		if len(statuses) == 0 {
+			<li>No hay estados de película por usuario cargados.</li>
+		} else {
+			for _, fus := range statuses {
+				<li>
+					<span>
+						{ fmt.Sprintf("Película ID: %d | Usuario ID: %d → Estado ID: %d", fus.FilmFilmid, fus.UserUserid, fus.StatusStatusid) }
+					</span>
+					<button type="button">Eliminar</button>
+				</li>
+			}
+		}
+	</ul>
+}

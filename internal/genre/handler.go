@@ -1,7 +1,7 @@
 package Genre
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -98,7 +98,7 @@ func (h *GenreHandler) getGenre(w http.ResponseWriter, r *http.Request, id int32
 
 // PUT /genres/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente.
 func (h *GenreHandler) updateGenre(w http.ResponseWriter, r *http.Request, id int32) {
-	var receivedGenre db.Genre
+	var receivedGenre dto.Genre
 	if err := json.NewDecoder(r.Body).Decode(&receivedGenre); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -144,7 +144,7 @@ func (h *GenreHandler) getGenres(w http.ResponseWriter, r *http.Request) {
 
 // POST /genres: Debe recibir datos en formato JSON, validarlos y usar el método CreateMultipleGenres.
 func (h *GenreHandler) createMultipleGenres(w http.ResponseWriter, r *http.Request) {
-	var genres []db.Genre
+	var genres []dto.Genre
 	if err := json.NewDecoder(r.Body).Decode(&genres); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -170,7 +170,7 @@ func (h *GenreHandler) deleteGenre(w http.ResponseWriter, r *http.Request, id in
 }
 
 func (h *GenreHandler) createGenre(w http.ResponseWriter, r *http.Request) {
-	var receivedGenre db.Genre
+	var receivedGenre dto.Genre
 	if err := json.NewDecoder(r.Body).Decode(&receivedGenre); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -184,4 +184,3 @@ func (h *GenreHandler) createGenre(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusCreated, createdGenre) // 201 (statusCreated)
 }
-

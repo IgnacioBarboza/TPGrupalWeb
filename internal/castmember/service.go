@@ -9,7 +9,7 @@ package CastMember
 
 // Imports
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 )
 
@@ -21,33 +21,33 @@ func NewCastMemberService(repo CastMemberRepository) *CastMemberService {
 	return &CastMemberService{repo: repo}
 }
 
-func (s *CastMemberService) GetCastMember(ctx context.Context, id int32) (db.Castmember, error) {
+func (s *CastMemberService) GetCastMember(ctx context.Context, id int32) (dto.Castmember, error) {
 	cm, err := s.repo.GetCastMember(ctx, id)
 
 	if err != nil {
-		return db.Castmember{}, err
+		return dto.Castmember{}, err
 	}
 
 	// EJEMPLO DE REGLA DE NEGOCIO
 	if cm.Castmemberid < 0 {
-		return db.Castmember{}, ErrInvalidCastMemberID
+		return dto.Castmember{}, ErrInvalidCastMemberID
 	}
 	return cm, nil
 }
 
-func (s *CastMemberService) GetCastMembers(ctx context.Context) ([]db.Castmember, error) {
+func (s *CastMemberService) GetCastMembers(ctx context.Context) ([]dto.Castmember, error) {
 	return s.repo.GetCastMembers(ctx)
 }
 
-func (s *CastMemberService) Create(ctx context.Context, castMember db.Castmember) (db.Castmember, error) {
+func (s *CastMemberService) Create(ctx context.Context, castMember dto.Castmember) (dto.Castmember, error) {
 	if err := validateCastMember(castMember); err != nil {
-		return db.Castmember{}, err
+		return dto.Castmember{}, err
 	}
 	return s.repo.Create(ctx, castMember)
 }
 
 // validateCastMember aplica las reglas de negocio comunes a Create y Update.
-func validateCastMember(castMember db.Castmember) error {
+func validateCastMember(castMember dto.Castmember) error {
 	if castMember.Castmembername == "" {
 		return ErrInvalidCastMemberNameEmpty
 	}
@@ -60,7 +60,7 @@ func validateCastMember(castMember db.Castmember) error {
 	return nil
 }
 
-func (s *CastMemberService) CreateMultipleCastMembers(ctx context.Context, castMembers []db.Castmember) ([]db.Castmember, error) {
+func (s *CastMemberService) CreateMultipleCastMembers(ctx context.Context, castMembers []dto.Castmember) ([]dto.Castmember, error) {
 	if len(castMembers) == 0 {
 		return nil, ErrInvalidCastMember
 	}
@@ -71,7 +71,7 @@ func (s *CastMemberService) CreateMultipleCastMembers(ctx context.Context, castM
 		}
 	}
 
-	created := make([]db.Castmember, 0, len(castMembers))
+	created := make([]dto.Castmember, 0, len(castMembers))
 	for _, castMember := range castMembers {
 		c, err := s.repo.Create(ctx, castMember)
 		if err != nil {
@@ -86,10 +86,9 @@ func (s *CastMemberService) Delete(ctx context.Context, id int32) error {
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *CastMemberService) Update(ctx context.Context, castMember db.Castmember) (db.Castmember, error) {
+func (s *CastMemberService) Update(ctx context.Context, castMember dto.Castmember) (dto.Castmember, error) {
 	if err := validateCastMember(castMember); err != nil {
-		return db.Castmember{}, err
+		return dto.Castmember{}, err
 	}
 	return s.repo.Update(ctx, castMember)
 }
-

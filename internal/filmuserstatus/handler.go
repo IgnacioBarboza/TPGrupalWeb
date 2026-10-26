@@ -1,7 +1,7 @@
 package FilmUserStatus
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -104,7 +104,7 @@ func (h *FilmUserStatusHandler) getFilmUserStatus(w http.ResponseWriter, r *http
 
 // PUT /filmuserstatuses/{filmID}/{userID}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente.
 func (h *FilmUserStatusHandler) updateFilmUserStatus(w http.ResponseWriter, r *http.Request, filmID int32, userID int32) {
-	var receivedFUS db.Filmuserstatus
+	var receivedFUS dto.Filmuserstatus
 	if err := json.NewDecoder(r.Body).Decode(&receivedFUS); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -150,7 +150,7 @@ func (h *FilmUserStatusHandler) getFilmUserStatuses(w http.ResponseWriter, r *ht
 
 // POST /filmuserstatuses: Debe recibir datos en formato JSON, validarlos y usar el método CreateMultipleFilmUserStatuses.
 func (h *FilmUserStatusHandler) createMultipleFilmUserStatuses(w http.ResponseWriter, r *http.Request) {
-	var statuses []db.Filmuserstatus
+	var statuses []dto.Filmuserstatus
 	if err := json.NewDecoder(r.Body).Decode(&statuses); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -176,7 +176,7 @@ func (h *FilmUserStatusHandler) deleteFilmUserStatus(w http.ResponseWriter, r *h
 }
 
 func (h *FilmUserStatusHandler) createFilmUserStatus(w http.ResponseWriter, r *http.Request) {
-	var receivedFUS db.Filmuserstatus
+	var receivedFUS dto.Filmuserstatus
 	if err := json.NewDecoder(r.Body).Decode(&receivedFUS); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -190,4 +190,3 @@ func (h *FilmUserStatusHandler) createFilmUserStatus(w http.ResponseWriter, r *h
 
 	writeJSON(w, http.StatusCreated, createdFUS) // 201 (statusCreated)
 }
-

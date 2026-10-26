@@ -1,7 +1,7 @@
 package Film
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -98,7 +98,7 @@ func (h *FilmHandler) getFilm(w http.ResponseWriter, r *http.Request, id int32) 
 
 // PUT /<entidades>/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente usando
 func (h *FilmHandler) updateFilm(w http.ResponseWriter, r *http.Request, id int32) {
-	var receivedfilm db.Film
+	var receivedfilm dto.Film
 	if err := json.NewDecoder(r.Body).Decode(&receivedfilm); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -145,7 +145,7 @@ func (h *FilmHandler) getFilms(w http.ResponseWriter, r *http.Request) {
 
 // POST /<entidades>: Debe recibir datos en formato JSON, validarlos (ej. que el título no esté vacío), usar el método Create...
 func (h *FilmHandler) createMultipleFilms(w http.ResponseWriter, r *http.Request) {
-	var films []db.Film
+	var films []dto.Film
 	if err := json.NewDecoder(r.Body).Decode(&films); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -171,7 +171,7 @@ func (h *FilmHandler) deleteFilm(w http.ResponseWriter, r *http.Request, id int3
 }
 
 func (h *FilmHandler) createFilm(w http.ResponseWriter, r *http.Request) {
-	var receivedfilm db.Film
+	var receivedfilm dto.Film
 	if err := json.NewDecoder(r.Body).Decode(&receivedfilm); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return

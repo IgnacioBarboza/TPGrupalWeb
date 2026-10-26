@@ -1,7 +1,7 @@
 package Status
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -98,7 +98,7 @@ func (h *StatusHandler) getStatus(w http.ResponseWriter, r *http.Request, id int
 
 // PUT /statuses/{id}: Recibe datos JSON, los valida, y actualiza el registro correspondiente.
 func (h *StatusHandler) updateStatus(w http.ResponseWriter, r *http.Request, id int32) {
-	var receivedStatus db.Status
+	var receivedStatus dto.Status
 	if err := json.NewDecoder(r.Body).Decode(&receivedStatus); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -145,7 +145,7 @@ func (h *StatusHandler) getStatuses(w http.ResponseWriter, r *http.Request) {
 
 // POST /statuses: Recibe datos en formato JSON (array), los valida y crea múltiples statuses.
 func (h *StatusHandler) createMultipleStatuses(w http.ResponseWriter, r *http.Request) {
-	var statuses []db.Status
+	var statuses []dto.Status
 	if err := json.NewDecoder(r.Body).Decode(&statuses); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -171,7 +171,7 @@ func (h *StatusHandler) deleteStatus(w http.ResponseWriter, r *http.Request, id 
 }
 
 func (h *StatusHandler) createStatus(w http.ResponseWriter, r *http.Request) {
-	var receivedStatus db.Status
+	var receivedStatus dto.Status
 	if err := json.NewDecoder(r.Body).Decode(&receivedStatus); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -185,4 +185,3 @@ func (h *StatusHandler) createStatus(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusCreated, createdStatus) // 201 (statusCreated)
 }
-

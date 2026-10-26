@@ -9,7 +9,7 @@ package FilmUserStatus
 
 // Imports
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 )
 
@@ -21,30 +21,30 @@ func NewFilmUserStatusService(repo FilmUserStatusRepository) *FilmUserStatusServ
 	return &FilmUserStatusService{repo: repo}
 }
 
-func (s *FilmUserStatusService) GetFilmUserStatus(ctx context.Context, filmID int32, userID int32) (db.Filmuserstatus, error) {
+func (s *FilmUserStatusService) GetFilmUserStatus(ctx context.Context, filmID int32, userID int32) (dto.Filmuserstatus, error) {
 	return s.repo.GetFilmUserStatus(ctx, filmID, userID)
 }
 
-func (s *FilmUserStatusService) GetFilmUserStatuses(ctx context.Context) ([]db.Filmuserstatus, error) {
+func (s *FilmUserStatusService) GetFilmUserStatuses(ctx context.Context) ([]dto.Filmuserstatus, error) {
 	return s.repo.GetFilmUserStatuses(ctx)
 }
 
-func (s *FilmUserStatusService) Create(ctx context.Context, fus db.Filmuserstatus) (db.Filmuserstatus, error) {
+func (s *FilmUserStatusService) Create(ctx context.Context, fus dto.Filmuserstatus) (dto.Filmuserstatus, error) {
 	if err := validateFilmUserStatus(fus); err != nil {
-		return db.Filmuserstatus{}, err
+		return dto.Filmuserstatus{}, err
 	}
 	return s.repo.Create(ctx, fus)
 }
 
 // validateFilmUserStatus aplica las reglas de negocio comunes a Create y Update.
-func validateFilmUserStatus(fus db.Filmuserstatus) error {
+func validateFilmUserStatus(fus dto.Filmuserstatus) error {
 	if fus.FilmFilmid <= 0 || fus.UserUserid <= 0 || fus.StatusStatusid <= 0 {
 		return ErrInvalidFilmUserStatusIDs
 	}
 	return nil
 }
 
-func (s *FilmUserStatusService) CreateMultipleFilmUserStatuses(ctx context.Context, statuses []db.Filmuserstatus) ([]db.Filmuserstatus, error) {
+func (s *FilmUserStatusService) CreateMultipleFilmUserStatuses(ctx context.Context, statuses []dto.Filmuserstatus) ([]dto.Filmuserstatus, error) {
 	if len(statuses) == 0 {
 		return nil, ErrInvalidFilmUserStatus
 	}
@@ -55,7 +55,7 @@ func (s *FilmUserStatusService) CreateMultipleFilmUserStatuses(ctx context.Conte
 		}
 	}
 
-	created := make([]db.Filmuserstatus, 0, len(statuses))
+	created := make([]dto.Filmuserstatus, 0, len(statuses))
 	for _, fus := range statuses {
 		c, err := s.repo.Create(ctx, fus)
 		if err != nil {
@@ -70,10 +70,9 @@ func (s *FilmUserStatusService) Delete(ctx context.Context, filmID int32, userID
 	return s.repo.Delete(ctx, filmID, userID)
 }
 
-func (s *FilmUserStatusService) Update(ctx context.Context, fus db.Filmuserstatus) (db.Filmuserstatus, error) {
+func (s *FilmUserStatusService) Update(ctx context.Context, fus dto.Filmuserstatus) (dto.Filmuserstatus, error) {
 	if err := validateFilmUserStatus(fus); err != nil {
-		return db.Filmuserstatus{}, err
+		return dto.Filmuserstatus{}, err
 	}
 	return s.repo.Update(ctx, fus)
 }
-

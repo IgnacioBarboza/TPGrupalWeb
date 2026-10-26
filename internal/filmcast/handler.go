@@ -1,7 +1,7 @@
 package FilmCast
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -127,7 +127,7 @@ func (h *FilmCastHandler) getFilmCasts(w http.ResponseWriter, r *http.Request) {
 
 // POST /filmcasts: Debe recibir datos en formato JSON, validarlos y usar el método CreateMultipleFilmCasts.
 func (h *FilmCastHandler) createMultipleFilmCasts(w http.ResponseWriter, r *http.Request) {
-	var filmCasts []db.Filmcast
+	var filmCasts []dto.Filmcast
 	if err := json.NewDecoder(r.Body).Decode(&filmCasts); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -153,7 +153,7 @@ func (h *FilmCastHandler) deleteFilmCast(w http.ResponseWriter, r *http.Request,
 }
 
 func (h *FilmCastHandler) createFilmCast(w http.ResponseWriter, r *http.Request) {
-	var receivedFilmCast db.Filmcast
+	var receivedFilmCast dto.Filmcast
 	if err := json.NewDecoder(r.Body).Decode(&receivedFilmCast); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -167,4 +167,3 @@ func (h *FilmCastHandler) createFilmCast(w http.ResponseWriter, r *http.Request)
 
 	writeJSON(w, http.StatusCreated, createdFilmCast) // 201 (statusCreated)
 }
-

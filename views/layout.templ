@@ -1,0 +1,105 @@
+package views
+
+import dto "WebGrupal/internal"
+
+// Datos para renderizar la página completa con todas las secciones de index.html
+type PageData struct {
+	Films            []dto.Film
+	Genres           []dto.Genre
+	CastMembers      []dto.Castmember
+	Statuses         []dto.Status
+	Users            []dto.User
+	Reviews          []dto.Review
+	FilmCasts        []dto.Filmcast
+	FilmGenres       []dto.Filmgenre
+	FilmUserStatuses []dto.Filmuserstatus
+}
+
+// Layout base de la página (HTML, HEAD con Pico.css, BODY)
+templ Layout(title string) {
+	<!doctype html>
+	<html lang="es">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
+			<link rel="stylesheet" href="/styles.css"/>
+		</head>
+		<body>
+			<main class="container">
+				<h1>IFDB - Catálogo de Películas</h1>
+				{ children... }
+			</main>
+			<script src="/app.js"></script>
+		</body>
+	</html>
+}
+
+// Index renderiza el body completo equivalente a index.html combinando forms y listas
+templ Index(data PageData) {
+	@Layout("IFDB - Internet Film Database") {
+		<!-- 1. FILM -->
+		<section>
+			<h2>Películas (Film)</h2>
+			@FilmForm()
+			@FilmList(data.Films)
+		</section>
+		<hr/>
+		<!-- 2. GENRE -->
+		<section>
+			<h2>Géneros (Genre)</h2>
+			@GenreForm()
+			@GenreList(data.Genres)
+		</section>
+		<hr/>
+		<!-- 3. CAST MEMBER -->
+		<section>
+			<h2>Miembros del Elenco (CastMember)</h2>
+			@CastMemberForm()
+			@CastMemberList(data.CastMembers)
+		</section>
+		<hr/>
+		<!-- 4. STATUS -->
+		<section>
+			<h2>Estados (Status)</h2>
+			@StatusForm()
+			@StatusList(data.Statuses)
+		</section>
+		<hr/>
+		<!-- 5. USER -->
+		<section>
+			<h2>Usuarios (User)</h2>
+			@UserForm()
+			@UserList(data.Users)
+		</section>
+		<hr/>
+		<!-- 6. REVIEW -->
+		<section>
+			<h2>Reseñas (Review)</h2>
+			@ReviewForm()
+			@ReviewList(data.Reviews)
+		</section>
+		<hr/>
+		<!-- 7. FILM CAST -->
+		<section>
+			<h2>Elenco por Película (FilmCast)</h2>
+			@FilmCastForm()
+			@FilmCastList(data.FilmCasts)
+		</section>
+		<hr/>
+		<!-- 8. FILM GENRE -->
+		<section>
+			<h2>Género por Película (FilmGenre)</h2>
+			@FilmGenreForm()
+			@FilmGenreList(data.FilmGenres)
+		</section>
+		<hr/>
+		<!-- 9. FILM USER STATUS -->
+		<section>
+			<h2>Estado de Película por Usuario (FilmUserStatus)</h2>
+			@FilmUserStatusForm()
+			@FilmUserStatusList(data.FilmUserStatuses)
+		</section>
+	}
+}

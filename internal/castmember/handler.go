@@ -1,7 +1,7 @@
 package CastMember
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -98,7 +98,7 @@ func (h *CastMemberHandler) getCastMember(w http.ResponseWriter, r *http.Request
 
 // PUT /castmembers/{id}: Recibe datos JSON, los valida, y actualiza el registro correspondiente.
 func (h *CastMemberHandler) updateCastMember(w http.ResponseWriter, r *http.Request, id int32) {
-	var receivedCastMember db.Castmember
+	var receivedCastMember dto.Castmember
 	if err := json.NewDecoder(r.Body).Decode(&receivedCastMember); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -147,7 +147,7 @@ func (h *CastMemberHandler) getCastMembers(w http.ResponseWriter, r *http.Reques
 
 // POST /castmembers: Recibe datos en formato JSON (array), los valida y crea múltiples castMembers.
 func (h *CastMemberHandler) createMultipleCastMembers(w http.ResponseWriter, r *http.Request) {
-	var castMembers []db.Castmember
+	var castMembers []dto.Castmember
 	if err := json.NewDecoder(r.Body).Decode(&castMembers); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -173,7 +173,7 @@ func (h *CastMemberHandler) deleteCastMember(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *CastMemberHandler) createCastMember(w http.ResponseWriter, r *http.Request) {
-	var receivedCastMember db.Castmember
+	var receivedCastMember dto.Castmember
 	if err := json.NewDecoder(r.Body).Decode(&receivedCastMember); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -187,4 +187,3 @@ func (h *CastMemberHandler) createCastMember(w http.ResponseWriter, r *http.Requ
 
 	writeJSON(w, http.StatusCreated, createdCastMember) // 201 (statusCreated)
 }
-

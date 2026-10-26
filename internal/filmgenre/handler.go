@@ -1,7 +1,7 @@
 package FilmGenre
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -127,7 +127,7 @@ func (h *FilmGenreHandler) getFilmGenres(w http.ResponseWriter, r *http.Request)
 
 // POST /filmgenres: Debe recibir datos en formato JSON, validarlos y usar el método CreateMultipleFilmGenres.
 func (h *FilmGenreHandler) createMultipleFilmGenres(w http.ResponseWriter, r *http.Request) {
-	var filmGenres []db.Filmgenre
+	var filmGenres []dto.Filmgenre
 	if err := json.NewDecoder(r.Body).Decode(&filmGenres); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -153,7 +153,7 @@ func (h *FilmGenreHandler) deleteFilmGenre(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *FilmGenreHandler) createFilmGenre(w http.ResponseWriter, r *http.Request) {
-	var receivedFilmGenre db.Filmgenre
+	var receivedFilmGenre dto.Filmgenre
 	if err := json.NewDecoder(r.Body).Decode(&receivedFilmGenre); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -167,4 +167,3 @@ func (h *FilmGenreHandler) createFilmGenre(w http.ResponseWriter, r *http.Reques
 
 	writeJSON(w, http.StatusCreated, createdFilmGenre) // 201 (statusCreated)
 }
-

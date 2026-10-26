@@ -10,6 +10,7 @@ package Film
 // Imports
 import (
 	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 	"database/sql"
 	"errors"
@@ -18,11 +19,11 @@ import (
 
 // Interfaz
 type FilmRepository interface {
-	GetFilm(ctx context.Context, id int32) (db.Film, error)
-	GetFilms(ctx context.Context) ([]db.Film, error)
-	Create(ctx context.Context, film db.Film) (db.Film, error)
+	GetFilm(ctx context.Context, id int32) (dto.Film, error)
+	GetFilms(ctx context.Context) ([]dto.Film, error)
+	Create(ctx context.Context, film dto.Film) (dto.Film, error)
 	Delete(ctx context.Context, id int32) error
-	Update(ctx context.Context, film db.Film) (db.Film, error)
+	Update(ctx context.Context, film dto.Film) (dto.Film, error)
 }
 
 type SQLCRepository struct {
@@ -36,46 +37,46 @@ func NewSQLCRepository(q *db.Queries) *SQLCRepository {
 
 //A partir de aca, implementaciones:
 
-func (r *SQLCRepository) GetFilm(ctx context.Context, id int32) (db.Film, error) {
+func (r *SQLCRepository) GetFilm(ctx context.Context, id int32) (dto.Film, error) {
 	f, err := r.queries.GetFilm(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return db.Film{}, ErrFilmNotFound
+			return dto.Film{}, ErrFilmNotFound
 		}
-		return db.Film{}, fmt.Errorf("consultar film %d: %w", id, err)
+		return dto.Film{}, fmt.Errorf("consultar film %d: %w", id, err)
 	}
-	return f, nil
+	return dto.Film(f), nil
 }
 
-func (r *SQLCRepository) GetFilms(ctx context.Context) ([]db.Film, error) {
+func (r *SQLCRepository) GetFilms(ctx context.Context) ([]dto.Film, error) {
 	rows, err := r.queries.GetFilms(ctx)
 	if err != nil {
 		return nil, err
 	}
-	films := make([]db.Film, 0, len(rows))
+	films := make([]dto.Film, 0, len(rows))
 	for _, f := range rows {
-		films = append(films, f)
+		films = append(films, dto.Film(f))
 	}
 	return films, nil
 }
 
-func (r *SQLCRepository) Create(ctx context.Context, film db.Film) (db.Film, error) {
+func (r *SQLCRepository) Create(ctx context.Context, film dto.Film) (dto.Film, error) {
 	f, err := r.queries.CreateFilm(ctx, db.CreateFilmParams{
 		Filmtitle:       film.Filmtitle,
 		Filmreleasedate: film.Filmreleasedate,
 		Filmduration:    film.Filmduration,
 	})
 	if err != nil {
-		return db.Film{}, err
+		return dto.Film{}, err
 	}
-	return f, nil
+	return dto.Film(f), nil
 }
 
 func (r *SQLCRepository) Delete(ctx context.Context, id int32) error {
 	return r.queries.DeleteFilm(ctx, id)
 }
 
-func (r *SQLCRepository) Update(ctx context.Context, film db.Film) (db.Film, error) {
+func (r *SQLCRepository) Update(ctx context.Context, film dto.Film) (dto.Film, error) {
 	err := r.queries.UpdateFilm(ctx, db.UpdateFilmParams{
 		Filmid:          film.Filmid,
 		Filmtitle:       film.Filmtitle,
@@ -83,7 +84,7 @@ func (r *SQLCRepository) Update(ctx context.Context, film db.Film) (db.Film, err
 		Filmduration:    film.Filmduration,
 	})
 	if err != nil {
-		return db.Film{}, err
+		return dto.Film{}, err
 	}
 	return r.GetFilm(ctx, film.Filmid)
 }

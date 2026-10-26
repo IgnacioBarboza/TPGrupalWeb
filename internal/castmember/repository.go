@@ -10,6 +10,7 @@ package CastMember
 // Imports
 import (
 	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 	"database/sql"
 	"errors"
@@ -18,11 +19,11 @@ import (
 
 // Interfaz
 type CastMemberRepository interface {
-	GetCastMember(ctx context.Context, id int32) (db.Castmember, error)
-	GetCastMembers(ctx context.Context) ([]db.Castmember, error)
-	Create(ctx context.Context, castMember db.Castmember) (db.Castmember, error)
+	GetCastMember(ctx context.Context, id int32) (dto.Castmember, error)
+	GetCastMembers(ctx context.Context) ([]dto.Castmember, error)
+	Create(ctx context.Context, castMember dto.Castmember) (dto.Castmember, error)
 	Delete(ctx context.Context, id int32) error
-	Update(ctx context.Context, castMember db.Castmember) (db.Castmember, error)
+	Update(ctx context.Context, castMember dto.Castmember) (dto.Castmember, error)
 }
 
 type SQLCRepository struct {
@@ -36,46 +37,46 @@ func NewSQLCRepository(q *db.Queries) *SQLCRepository {
 
 // A partir de aca, implementaciones:
 
-func (r *SQLCRepository) GetCastMember(ctx context.Context, id int32) (db.Castmember, error) {
+func (r *SQLCRepository) GetCastMember(ctx context.Context, id int32) (dto.Castmember, error) {
 	c, err := r.queries.GetCastMember(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return db.Castmember{}, ErrCastMemberNotFound
+			return dto.Castmember{}, ErrCastMemberNotFound
 		}
-		return db.Castmember{}, fmt.Errorf("consultar castmember %d: %w", id, err)
+		return dto.Castmember{}, fmt.Errorf("consultar castmember %d: %w", id, err)
 	}
-	return c, nil
+	return dto.Castmember(c), nil
 }
 
-func (r *SQLCRepository) GetCastMembers(ctx context.Context) ([]db.Castmember, error) {
+func (r *SQLCRepository) GetCastMembers(ctx context.Context) ([]dto.Castmember, error) {
 	rows, err := r.queries.GetCastMembers(ctx)
 	if err != nil {
 		return nil, err
 	}
-	castMembers := make([]db.Castmember, 0, len(rows))
+	castMembers := make([]dto.Castmember, 0, len(rows))
 	for _, c := range rows {
-		castMembers = append(castMembers, c)
+		castMembers = append(castMembers, dto.Castmember(c))
 	}
 	return castMembers, nil
 }
 
-func (r *SQLCRepository) Create(ctx context.Context, castMember db.Castmember) (db.Castmember, error) {
+func (r *SQLCRepository) Create(ctx context.Context, castMember dto.Castmember) (dto.Castmember, error) {
 	c, err := r.queries.CreateCastMember(ctx, db.CreateCastMemberParams{
 		Castmembername:   castMember.Castmembername,
 		Castmemberrole:   castMember.Castmemberrole,
 		Castmembergender: castMember.Castmembergender,
 	})
 	if err != nil {
-		return db.Castmember{}, err
+		return dto.Castmember{}, err
 	}
-	return c, nil
+	return dto.Castmember(c), nil
 }
 
 func (r *SQLCRepository) Delete(ctx context.Context, id int32) error {
 	return r.queries.DeleteCastMember(ctx, id)
 }
 
-func (r *SQLCRepository) Update(ctx context.Context, castMember db.Castmember) (db.Castmember, error) {
+func (r *SQLCRepository) Update(ctx context.Context, castMember dto.Castmember) (dto.Castmember, error) {
 	err := r.queries.UpdateCastMember(ctx, db.UpdateCastMemberParams{
 		Castmemberid:     castMember.Castmemberid,
 		Castmembername:   castMember.Castmembername,
@@ -83,8 +84,7 @@ func (r *SQLCRepository) Update(ctx context.Context, castMember db.Castmember) (
 		Castmembergender: castMember.Castmembergender,
 	})
 	if err != nil {
-		return db.Castmember{}, err
+		return dto.Castmember{}, err
 	}
 	return r.GetCastMember(ctx, castMember.Castmemberid)
 }
-

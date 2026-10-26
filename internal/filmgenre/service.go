@@ -9,7 +9,7 @@ package FilmGenre
 
 // Imports
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 )
 
@@ -21,30 +21,30 @@ func NewFilmGenreService(repo FilmGenreRepository) *FilmGenreService {
 	return &FilmGenreService{repo: repo}
 }
 
-func (s *FilmGenreService) GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (db.Filmgenre, error) {
+func (s *FilmGenreService) GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (dto.Filmgenre, error) {
 	return s.repo.GetFilmGenre(ctx, genreID, filmID)
 }
 
-func (s *FilmGenreService) GetFilmGenres(ctx context.Context) ([]db.Filmgenre, error) {
+func (s *FilmGenreService) GetFilmGenres(ctx context.Context) ([]dto.Filmgenre, error) {
 	return s.repo.GetFilmGenres(ctx)
 }
 
-func (s *FilmGenreService) Create(ctx context.Context, filmGenre db.Filmgenre) (db.Filmgenre, error) {
+func (s *FilmGenreService) Create(ctx context.Context, filmGenre dto.Filmgenre) (dto.Filmgenre, error) {
 	if err := validateFilmGenre(filmGenre); err != nil {
-		return db.Filmgenre{}, err
+		return dto.Filmgenre{}, err
 	}
 	return s.repo.Create(ctx, filmGenre)
 }
 
 // validateFilmGenre aplica las reglas de negocio comunes a Create.
-func validateFilmGenre(filmGenre db.Filmgenre) error {
+func validateFilmGenre(filmGenre dto.Filmgenre) error {
 	if filmGenre.GenreGenreid <= 0 || filmGenre.FilmFilmid <= 0 {
 		return ErrInvalidFilmGenreIDs
 	}
 	return nil
 }
 
-func (s *FilmGenreService) CreateMultipleFilmGenres(ctx context.Context, filmGenres []db.Filmgenre) ([]db.Filmgenre, error) {
+func (s *FilmGenreService) CreateMultipleFilmGenres(ctx context.Context, filmGenres []dto.Filmgenre) ([]dto.Filmgenre, error) {
 	if len(filmGenres) == 0 {
 		return nil, ErrInvalidFilmGenre
 	}
@@ -55,7 +55,7 @@ func (s *FilmGenreService) CreateMultipleFilmGenres(ctx context.Context, filmGen
 		}
 	}
 
-	created := make([]db.Filmgenre, 0, len(filmGenres))
+	created := make([]dto.Filmgenre, 0, len(filmGenres))
 	for _, fg := range filmGenres {
 		c, err := s.repo.Create(ctx, fg)
 		if err != nil {
@@ -69,4 +69,3 @@ func (s *FilmGenreService) CreateMultipleFilmGenres(ctx context.Context, filmGen
 func (s *FilmGenreService) Delete(ctx context.Context, genreID int32, filmID int32) error {
 	return s.repo.Delete(ctx, genreID, filmID)
 }
-

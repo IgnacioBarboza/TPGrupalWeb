@@ -1,7 +1,7 @@
 package Review
 
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"encoding/json"
 	"errors"
 	"log"
@@ -105,7 +105,7 @@ func (h *ReviewHandler) getReview(w http.ResponseWriter, r *http.Request, filmID
 
 // PUT /reviews/{filmID}/{userID}: Recibe datos JSON, los valida, y actualiza el registro correspondiente.
 func (h *ReviewHandler) updateReview(w http.ResponseWriter, r *http.Request, filmID int32, userID int32) {
-	var receivedReview db.Review
+	var receivedReview dto.Review
 	if err := json.NewDecoder(r.Body).Decode(&receivedReview); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -152,7 +152,7 @@ func (h *ReviewHandler) getReviews(w http.ResponseWriter, r *http.Request) {
 
 // POST /reviews: Recibe datos en formato JSON (array), los valida y crea múltiples reviews.
 func (h *ReviewHandler) createMultipleReviews(w http.ResponseWriter, r *http.Request) {
-	var reviews []db.Review
+	var reviews []dto.Review
 	if err := json.NewDecoder(r.Body).Decode(&reviews); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return
@@ -178,7 +178,7 @@ func (h *ReviewHandler) deleteReview(w http.ResponseWriter, r *http.Request, fil
 }
 
 func (h *ReviewHandler) createReview(w http.ResponseWriter, r *http.Request) {
-	var receivedReview db.Review
+	var receivedReview dto.Review
 	if err := json.NewDecoder(r.Body).Decode(&receivedReview); err != nil {
 		http.Error(w, "Error al decodificar el JSON", http.StatusBadRequest)
 		return

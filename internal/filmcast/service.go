@@ -9,7 +9,7 @@ package FilmCast
 
 // Imports
 import (
-	db "WebGrupal/db/sqlc"
+	dto "WebGrupal/internal"
 	"context"
 )
 
@@ -21,30 +21,30 @@ func NewFilmCastService(repo FilmCastRepository) *FilmCastService {
 	return &FilmCastService{repo: repo}
 }
 
-func (s *FilmCastService) GetFilmCast(ctx context.Context, filmID int32, castMemberID int32) (db.Filmcast, error) {
+func (s *FilmCastService) GetFilmCast(ctx context.Context, filmID int32, castMemberID int32) (dto.Filmcast, error) {
 	return s.repo.GetFilmCast(ctx, filmID, castMemberID)
 }
 
-func (s *FilmCastService) GetFilmCasts(ctx context.Context) ([]db.Filmcast, error) {
+func (s *FilmCastService) GetFilmCasts(ctx context.Context) ([]dto.Filmcast, error) {
 	return s.repo.GetFilmCasts(ctx)
 }
 
-func (s *FilmCastService) Create(ctx context.Context, filmCast db.Filmcast) (db.Filmcast, error) {
+func (s *FilmCastService) Create(ctx context.Context, filmCast dto.Filmcast) (dto.Filmcast, error) {
 	if err := validateFilmCast(filmCast); err != nil {
-		return db.Filmcast{}, err
+		return dto.Filmcast{}, err
 	}
 	return s.repo.Create(ctx, filmCast)
 }
 
 // validateFilmCast aplica las reglas de negocio comunes a Create.
-func validateFilmCast(filmCast db.Filmcast) error {
+func validateFilmCast(filmCast dto.Filmcast) error {
 	if filmCast.Filmid <= 0 || filmCast.Castmemberid <= 0 {
 		return ErrInvalidFilmCastIDs
 	}
 	return nil
 }
 
-func (s *FilmCastService) CreateMultipleFilmCasts(ctx context.Context, filmCasts []db.Filmcast) ([]db.Filmcast, error) {
+func (s *FilmCastService) CreateMultipleFilmCasts(ctx context.Context, filmCasts []dto.Filmcast) ([]dto.Filmcast, error) {
 	if len(filmCasts) == 0 {
 		return nil, ErrInvalidFilmCast
 	}
@@ -55,7 +55,7 @@ func (s *FilmCastService) CreateMultipleFilmCasts(ctx context.Context, filmCasts
 		}
 	}
 
-	created := make([]db.Filmcast, 0, len(filmCasts))
+	created := make([]dto.Filmcast, 0, len(filmCasts))
 	for _, fc := range filmCasts {
 		c, err := s.repo.Create(ctx, fc)
 		if err != nil {
@@ -69,4 +69,3 @@ func (s *FilmCastService) CreateMultipleFilmCasts(ctx context.Context, filmCasts
 func (s *FilmCastService) Delete(ctx context.Context, filmID int32, castMemberID int32) error {
 	return s.repo.Delete(ctx, filmID, castMemberID)
 }
-
