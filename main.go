@@ -120,6 +120,10 @@ func main() {
 	filmGenreHandler.Register(mux)
 	filmUserStatusHandler.Register(mux)
 
-	log.Println("Escuchando en :8080")
+	staticDir := "./static"
+	fileServer := http.FileServer(http.Dir(staticDir))
+	mux.Handle("/", fileServer)
+
+	log.Println("Servidor escuchando en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }

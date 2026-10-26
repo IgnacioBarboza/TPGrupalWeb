@@ -10,4 +10,5 @@ RUN go build -o app .
 FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/app .
+COPY --from=builder /app/static ./static
 CMD ["./app"]

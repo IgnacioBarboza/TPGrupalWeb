@@ -78,7 +78,7 @@ start: copyEnv generatesqlc cleanDB
 # Levanta el servidor en primer plano para pruebas manuales
 StartServer: copyEnv check-sqlc
 	@echo "\n=== Iniciando Servidor de Pruebas ==="
-	@docker compose up --build 
+	@docker compose up --build
 
 # Frena el servidor sin borrar los datos de la BD
 StopServer:

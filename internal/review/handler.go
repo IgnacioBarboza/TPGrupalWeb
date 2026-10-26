@@ -192,4 +192,3 @@ func (h *ReviewHandler) createReview(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusCreated, createdReview) // 201 (statusCreated)
 }
-
