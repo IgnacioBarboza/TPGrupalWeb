@@ -32,6 +32,10 @@ go.work.sum
 
 db/sqlc/
 
+# No entregamos los archivo .go de templ
+
+db/views/*.go
+
 # log files
 *.log
 
