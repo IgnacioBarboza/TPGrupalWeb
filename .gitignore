@@ -32,9 +32,8 @@ go.work.sum
 
 db/sqlc/
 
-# No entregamos los archivo .go de templ
-
-db/views/*.go
+# No entregamos el código Go generado por templ (se regenera con make generatetempl)
+views/*.go
 
 # log files
 *.log
