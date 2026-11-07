@@ -28,7 +28,7 @@ templ GenreForm() {
 
 // 3. CAST MEMBER FORM
 templ CastMemberForm() {
-	<form id="form-castmember">
+	<form id="form-castmember" method="POST" action="/castmembers">
 		<label for="castmember-name">Nombre:</label>
 		<input type="text" id="castmember-name" name="castmembername" maxlength="100" required/>
 

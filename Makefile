@@ -4,6 +4,8 @@
 # Variables
 APP_NAME := app
 SQLC_GENERATED := $(shell ls ./db/sqlc 2>/dev/null || echo "")
+# Usa templ del PATH, o el instalado con go install si no está en el PATH
+TEMPL := $(shell command -v templ 2>/dev/null || echo $(HOME)/go/bin/templ)
 
 # Chequea si está generado sqlc, sino lo genera
 check-sqlc:
@@ -65,8 +67,19 @@ rebuild: downDocker
 copyEnv:
 	cp .env.example .env
 
+# Elimina los archivos .go generados por templ en views/
+delete-templ:
+	@echo "DEBUG delete-templ"
+	rm -f views/*_templ.go
+
+# Elimina templ anterior y lo regenera desde cero
+generatetempl: delete-templ
+	@echo "DEBUG generatetempl"
+	$(TEMPL) generate -path ./views
+	@echo "Nuevo templ generado"
+
 # Limpia la BD, regenera sqlc, levanta Docker, corre requests.bash y apaga
-start: copyEnv generatesqlc cleanDB
+start: copyEnv generatesqlc generatetempl cleanDB
 	@echo "Limpiando e iniciando Docker"
 	@docker compose up --build -d 
 	@echo "Ejecutando batch de testing de Curls"
@@ -109,6 +122,8 @@ help:
 	@echo "  check-sqlc       Genera el código de sqlc si no existe"
 	@echo "  generatesqlc     Borra y regenera el código de sqlc"
 	@echo "  delete-sqlc      Elimina la carpeta db/sqlc"
+	@echo "  generatetempl    Borra y regenera los .go de views/ con templ"
+	@echo "  delete-templ     Elimina los *_templ.go de views/"
 	@echo "  copyEnv          Copia .env.example a .env"
 	@echo "  clean            Elimina binarios y temporales locales"
 	@echo ""
