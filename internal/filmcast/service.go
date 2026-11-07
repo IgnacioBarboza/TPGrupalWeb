@@ -21,10 +21,6 @@ func NewFilmCastService(repo FilmCastRepository) *FilmCastService {
 	return &FilmCastService{repo: repo}
 }
 
-func (s *FilmCastService) GetFilmCast(ctx context.Context, filmID int32, castMemberID int32) (dto.Filmcast, error) {
-	return s.repo.GetFilmCast(ctx, filmID, castMemberID)
-}
-
 func (s *FilmCastService) GetFilmCasts(ctx context.Context) ([]dto.Filmcast, error) {
 	return s.repo.GetFilmCasts(ctx)
 }
@@ -42,30 +38,4 @@ func validateFilmCast(filmCast dto.Filmcast) error {
 		return ErrInvalidFilmCastIDs
 	}
 	return nil
-}
-
-func (s *FilmCastService) CreateMultipleFilmCasts(ctx context.Context, filmCasts []dto.Filmcast) ([]dto.Filmcast, error) {
-	if len(filmCasts) == 0 {
-		return nil, ErrInvalidFilmCast
-	}
-	// Valida todos
-	for _, fc := range filmCasts {
-		if err := validateFilmCast(fc); err != nil {
-			return nil, err
-		}
-	}
-
-	created := make([]dto.Filmcast, 0, len(filmCasts))
-	for _, fc := range filmCasts {
-		c, err := s.repo.Create(ctx, fc)
-		if err != nil {
-			return nil, err
-		}
-		created = append(created, c)
-	}
-	return created, nil
-}
-
-func (s *FilmCastService) Delete(ctx context.Context, filmID int32, castMemberID int32) error {
-	return s.repo.Delete(ctx, filmID, castMemberID)
 }

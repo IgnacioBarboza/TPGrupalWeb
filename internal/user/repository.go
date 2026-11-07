@@ -12,18 +12,12 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
-	"database/sql"
-	"errors"
-	"fmt"
 )
 
 // Interfaz
 type UserRepository interface {
-	GetUser(ctx context.Context, id int32) (dto.User, error)
 	GetUsers(ctx context.Context) ([]dto.User, error)
 	Create(ctx context.Context, user dto.User) (dto.User, error)
-	Delete(ctx context.Context, id int32) error
-	Update(ctx context.Context, user dto.User) (dto.User, error)
 }
 
 type SQLCRepository struct {
@@ -36,17 +30,6 @@ func NewSQLCRepository(q *db.Queries) *SQLCRepository {
 }
 
 // A partir de aca, implementaciones:
-
-func (r *SQLCRepository) GetUser(ctx context.Context, id int32) (dto.User, error) {
-	u, err := r.queries.GetUser(ctx, id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return dto.User{}, ErrUserNotFound
-		}
-		return dto.User{}, fmt.Errorf("consultar user %d: %w", id, err)
-	}
-	return dto.User(u), nil
-}
 
 func (r *SQLCRepository) GetUsers(ctx context.Context) ([]dto.User, error) {
 	rows, err := r.queries.GetUsers(ctx)
@@ -71,22 +54,4 @@ func (r *SQLCRepository) Create(ctx context.Context, user dto.User) (dto.User, e
 		return dto.User{}, err
 	}
 	return dto.User(u), nil
-}
-
-func (r *SQLCRepository) Delete(ctx context.Context, id int32) error {
-	return r.queries.DeleteUser(ctx, id)
-}
-
-func (r *SQLCRepository) Update(ctx context.Context, user dto.User) (dto.User, error) {
-	err := r.queries.UpdateUser(ctx, db.UpdateUserParams{
-		Userid:             user.Userid,
-		Username:           user.Username,
-		Userpasswordhashed: user.Userpasswordhashed,
-		Userbirthday:       user.Userbirthday,
-		Usergenre:          user.Usergenre,
-	})
-	if err != nil {
-		return dto.User{}, err
-	}
-	return r.GetUser(ctx, user.Userid)
 }

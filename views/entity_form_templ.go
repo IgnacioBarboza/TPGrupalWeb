@@ -27,7 +27,7 @@ func FilmForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form id=\"form-film\"><label for=\"film-title\">Título:</label> <input type=\"text\" id=\"film-title\" name=\"filmtitle\" maxlength=\"200\" required> <label for=\"film-release-date\">Fecha de estreno:</label> <input type=\"date\" id=\"film-release-date\" name=\"filmreleasedate\" required> <label for=\"film-duration\">Duración (min):</label> <input type=\"number\" id=\"film-duration\" name=\"filmduration\" min=\"1\" required> <button type=\"submit\">Crear Película</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form id=\"form-film\" method=\"POST\" action=\"/films\"><label for=\"film-title\">Título:</label> <input type=\"text\" id=\"film-title\" name=\"filmtitle\" maxlength=\"200\" required> <label for=\"film-release-date\">Fecha de estreno:</label> <input type=\"date\" id=\"film-release-date\" name=\"filmreleasedate\" required> <label for=\"film-duration\">Duración (min):</label> <input type=\"number\" id=\"film-duration\" name=\"filmduration\" min=\"1\" required> <button type=\"submit\">Crear Película</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -53,7 +53,7 @@ func GenreForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form id=\"form-genre\"><label for=\"genre-name\">Nombre del género:</label> <input type=\"text\" id=\"genre-name\" name=\"genrename\" maxlength=\"30\" required> <button type=\"submit\">Crear Género</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form id=\"form-genre\" method=\"POST\" action=\"/genres\"><label for=\"genre-name\">Nombre del género:</label> <input type=\"text\" id=\"genre-name\" name=\"genrename\" maxlength=\"30\" required> <button type=\"submit\">Crear Género</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -79,7 +79,7 @@ func CastMemberForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form id=\"form-castmember\"><label for=\"castmember-name\">Nombre:</label> <input type=\"text\" id=\"castmember-name\" name=\"castmembername\" maxlength=\"100\" required> <label for=\"castmember-role\">Rol (1 carácter, ej. A/D):</label> <input type=\"text\" id=\"castmember-role\" name=\"castmemberrole\" maxlength=\"1\" required> <label for=\"castmember-gender\">Género (1 carácter, ej. M/F):</label> <input type=\"text\" id=\"castmember-gender\" name=\"castmembergender\" maxlength=\"1\" required> <button type=\"submit\">Crear Miembro</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form id=\"form-castmember\" method=\"POST\" action=\"/castmembers\"><label for=\"castmember-name\">Nombre:</label> <input type=\"text\" id=\"castmember-name\" name=\"castmembername\" maxlength=\"100\" required> <label for=\"castmember-role\">Rol (1 carácter, ej. A/D):</label> <input type=\"text\" id=\"castmember-role\" name=\"castmemberrole\" maxlength=\"1\" required> <label for=\"castmember-gender\">Género (1 carácter, ej. M/F):</label> <input type=\"text\" id=\"castmember-gender\" name=\"castmembergender\" maxlength=\"1\" required> <button type=\"submit\">Crear Miembro</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -105,7 +105,7 @@ func StatusForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form id=\"form-status\"><label for=\"status-name\">Nombre del estado:</label> <input type=\"text\" id=\"status-name\" name=\"statusname\" maxlength=\"20\" required> <button type=\"submit\">Crear Estado</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form id=\"form-status\" method=\"POST\" action=\"/statuses\"><label for=\"status-name\">Nombre del estado:</label> <input type=\"text\" id=\"status-name\" name=\"statusname\" maxlength=\"20\" required> <button type=\"submit\">Crear Estado</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -131,7 +131,7 @@ func UserForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form id=\"form-user\"><label for=\"user-name\">Nombre de usuario:</label> <input type=\"text\" id=\"user-name\" name=\"username\" maxlength=\"120\" required> <label for=\"user-password\">Contraseña:</label> <input type=\"password\" id=\"user-password\" name=\"userpasswordhashed\" maxlength=\"200\" required> <label for=\"user-birthday\">Fecha de nacimiento:</label> <input type=\"date\" id=\"user-birthday\" name=\"userbirthday\" required> <label for=\"user-genre\">Género (1 carácter, ej. M/F):</label> <input type=\"text\" id=\"user-genre\" name=\"usergenre\" maxlength=\"1\" required> <button type=\"submit\">Crear Usuario</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form id=\"form-user\" method=\"POST\" action=\"/users\"><label for=\"user-name\">Nombre de usuario:</label> <input type=\"text\" id=\"user-name\" name=\"username\" maxlength=\"120\" required> <label for=\"user-password\">Contraseña:</label> <input type=\"password\" id=\"user-password\" name=\"userpasswordhashed\" maxlength=\"200\" required> <label for=\"user-birthday\">Fecha de nacimiento:</label> <input type=\"date\" id=\"user-birthday\" name=\"userbirthday\" required> <label for=\"user-genre\">Género (1 carácter, ej. M/F):</label> <input type=\"text\" id=\"user-genre\" name=\"usergenre\" maxlength=\"1\" required> <button type=\"submit\">Crear Usuario</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -157,7 +157,7 @@ func ReviewForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form id=\"form-review\"><label for=\"review-film-id\">ID Película:</label> <input type=\"number\" id=\"review-film-id\" name=\"reviewfilmid\" min=\"1\" required> <label for=\"review-user-id\">ID Usuario:</label> <input type=\"number\" id=\"review-user-id\" name=\"reviewuserid\" min=\"1\" required> <label for=\"review-stars\">Estrellas (1-5):</label> <input type=\"number\" id=\"review-stars\" name=\"reviewstars\" min=\"1\" max=\"5\" required> <label for=\"review-description\">Descripción:</label> <textarea id=\"review-description\" name=\"reviewdescription\" required></textarea> <button type=\"submit\">Crear Reseña</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form id=\"form-review\" method=\"POST\" action=\"/reviews\"><label for=\"review-film-id\">ID Película:</label> <input type=\"number\" id=\"review-film-id\" name=\"reviewfilmid\" min=\"1\" required> <label for=\"review-user-id\">ID Usuario:</label> <input type=\"number\" id=\"review-user-id\" name=\"reviewuserid\" min=\"1\" required> <label for=\"review-stars\">Estrellas (1-5):</label> <input type=\"number\" id=\"review-stars\" name=\"reviewstars\" min=\"1\" max=\"5\" required> <label for=\"review-description\">Descripción:</label> <textarea id=\"review-description\" name=\"reviewdescription\" required></textarea> <button type=\"submit\">Crear Reseña</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -183,7 +183,7 @@ func FilmCastForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<form id=\"form-filmcast\"><label for=\"filmcast-film-id\">ID Película:</label> <input type=\"number\" id=\"filmcast-film-id\" name=\"filmid\" min=\"1\" required> <label for=\"filmcast-castmember-id\">ID Miembro del Elenco:</label> <input type=\"number\" id=\"filmcast-castmember-id\" name=\"castmemberid\" min=\"1\" required> <button type=\"submit\">Asociar Elenco a Película</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<form id=\"form-filmcast\" method=\"POST\" action=\"/filmcasts\"><label for=\"filmcast-film-id\">ID Película:</label> <input type=\"number\" id=\"filmcast-film-id\" name=\"filmid\" min=\"1\" required> <label for=\"filmcast-castmember-id\">ID Miembro del Elenco:</label> <input type=\"number\" id=\"filmcast-castmember-id\" name=\"castmemberid\" min=\"1\" required> <button type=\"submit\">Asociar Elenco a Película</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -209,7 +209,7 @@ func FilmGenreForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<form id=\"form-filmgenre\"><label for=\"filmgenre-genre-id\">ID Género:</label> <input type=\"number\" id=\"filmgenre-genre-id\" name=\"genre_genreid\" min=\"1\" required> <label for=\"filmgenre-film-id\">ID Película:</label> <input type=\"number\" id=\"filmgenre-film-id\" name=\"film_filmid\" min=\"1\" required> <button type=\"submit\">Asociar Género a Película</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<form id=\"form-filmgenre\" method=\"POST\" action=\"/filmgenres\"><label for=\"filmgenre-genre-id\">ID Género:</label> <input type=\"number\" id=\"filmgenre-genre-id\" name=\"genre_genreid\" min=\"1\" required> <label for=\"filmgenre-film-id\">ID Película:</label> <input type=\"number\" id=\"filmgenre-film-id\" name=\"film_filmid\" min=\"1\" required> <button type=\"submit\">Asociar Género a Película</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -235,7 +235,7 @@ func FilmUserStatusForm() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<form id=\"form-filmuserstatus\"><label for=\"fus-film-id\">ID Película:</label> <input type=\"number\" id=\"fus-film-id\" name=\"film_filmid\" min=\"1\" required> <label for=\"fus-user-id\">ID Usuario:</label> <input type=\"number\" id=\"fus-user-id\" name=\"user_userid\" min=\"1\" required> <label for=\"fus-status-id\">ID Estado:</label> <input type=\"number\" id=\"fus-status-id\" name=\"status_statusid\" min=\"1\" required> <button type=\"submit\">Asignar Estado</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<form id=\"form-filmuserstatus\" method=\"POST\" action=\"/filmuserstatuses\"><label for=\"fus-film-id\">ID Película:</label> <input type=\"number\" id=\"fus-film-id\" name=\"film_filmid\" min=\"1\" required> <label for=\"fus-user-id\">ID Usuario:</label> <input type=\"number\" id=\"fus-user-id\" name=\"user_userid\" min=\"1\" required> <label for=\"fus-status-id\">ID Estado:</label> <input type=\"number\" id=\"fus-status-id\" name=\"status_statusid\" min=\"1\" required> <button type=\"submit\">Asignar Estado</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

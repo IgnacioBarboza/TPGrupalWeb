@@ -190,6 +190,17 @@ func main() {
 	// Página principal: solo la ruta exacta "/"
 	mux.HandleFunc("GET /{$}", HandlerPrincipal)
 
+	// Formularios: POST /<entidades> crea el registro y redirige a "/" (PRG)
+	mux.HandleFunc("POST /films", film.NewFilmHandler(filmSvc).CreateFromForm)
+	mux.HandleFunc("POST /genres", Genre.NewGenreHandler(genreSvc).CreateFromForm)
+	mux.HandleFunc("POST /castmembers", CastMember.NewCastMemberHandler(castMemberSvc).CreateFromForm)
+	mux.HandleFunc("POST /statuses", Status.NewStatusHandler(statusSvc).CreateFromForm)
+	mux.HandleFunc("POST /users", User.NewUserHandler(userSvc).CreateFromForm)
+	mux.HandleFunc("POST /reviews", Review.NewReviewHandler(reviewSvc).CreateFromForm)
+	mux.HandleFunc("POST /filmcasts", FilmCast.NewFilmCastHandler(filmCastSvc).CreateFromForm)
+	mux.HandleFunc("POST /filmgenres", FilmGenre.NewFilmGenreHandler(filmGenreSvc).CreateFromForm)
+	mux.HandleFunc("POST /filmuserstatuses", FilmUserStatus.NewFilmUserStatusHandler(filmUserStatusSvc).CreateFromForm)
+
 	log.Println("Servidor escuchando en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }

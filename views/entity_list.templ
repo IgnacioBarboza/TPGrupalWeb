@@ -16,7 +16,6 @@ templ FilmList(films []dto.Film) {
 					<span>
 						{ fmt.Sprintf("[ID: %d] %s - Estreno: %s - Duración: %d min", film.Filmid, film.Filmtitle, film.Filmreleasedate.Format("2006-01-02"), film.Filmduration) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -34,7 +33,6 @@ templ GenreList(genres []dto.Genre) {
 					<span>
 						{ fmt.Sprintf("[ID: %d] %s", genre.Genreid, genre.Genrename) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -52,7 +50,6 @@ templ CastMemberList(castMembers []dto.Castmember) {
 					<span>
 						{ fmt.Sprintf("[ID: %d] %s - Rol: %s - Género: %s", cm.Castmemberid, cm.Castmembername, cm.Castmemberrole, cm.Castmembergender) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -70,7 +67,6 @@ templ StatusList(statuses []dto.Status) {
 					<span>
 						{ fmt.Sprintf("[ID: %d] %s", st.Statusid, st.Statusname) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -88,7 +84,6 @@ templ UserList(users []dto.User) {
 					<span>
 						{ fmt.Sprintf("[ID: %d] %s - Nacimiento: %s - Género: %s", u.Userid, u.Username, u.Userbirthday.Format("2006-01-02"), u.Usergenre) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -106,7 +101,6 @@ templ ReviewList(reviews []dto.Review) {
 					<span>
 						{ fmt.Sprintf("[Película ID: %d | Usuario ID: %d] %d★ - %q", rev.Reviewfilmid, rev.Reviewuserid, rev.Reviewstars, rev.Reviewdescription) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -124,7 +118,6 @@ templ FilmCastList(filmCasts []dto.Filmcast) {
 					<span>
 						{ fmt.Sprintf("Película ID: %d ↔ Miembro Elenco ID: %d", fc.Filmid, fc.Castmemberid) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -142,7 +135,6 @@ templ FilmGenreList(filmGenres []dto.Filmgenre) {
 					<span>
 						{ fmt.Sprintf("Género ID: %d ↔ Película ID: %d", fg.GenreGenreid, fg.FilmFilmid) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}
@@ -160,7 +152,6 @@ templ FilmUserStatusList(statuses []dto.Filmuserstatus) {
 					<span>
 						{ fmt.Sprintf("Película ID: %d | Usuario ID: %d → Estado ID: %d", fus.FilmFilmid, fus.UserUserid, fus.StatusStatusid) }
 					</span>
-					<button type="button">Eliminar</button>
 				</li>
 			}
 		}

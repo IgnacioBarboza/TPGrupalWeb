@@ -58,4 +58,3 @@ type User struct {
 	Userbirthday       time.Time `json:"userbirthday"`
 	Usergenre          string    `json:"usergenre"`
 }
-

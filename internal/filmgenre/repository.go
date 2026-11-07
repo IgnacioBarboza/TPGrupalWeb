@@ -12,18 +12,13 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
-	"database/sql"
-	"errors"
-	"fmt"
 )
 
 // Interfaz
 // FilmGenre es una tabla de union sin campos propios, por lo que no tiene operacion Update.
 type FilmGenreRepository interface {
-	GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (dto.Filmgenre, error)
 	GetFilmGenres(ctx context.Context) ([]dto.Filmgenre, error)
 	Create(ctx context.Context, filmGenre dto.Filmgenre) (dto.Filmgenre, error)
-	Delete(ctx context.Context, genreID int32, filmID int32) error
 }
 
 type SQLCRepository struct {
@@ -36,20 +31,6 @@ func NewSQLCRepository(q *db.Queries) *SQLCRepository {
 }
 
 // A partir de aca, implementaciones:
-
-func (r *SQLCRepository) GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (dto.Filmgenre, error) {
-	fg, err := r.queries.GetFilmGenre(ctx, db.GetFilmGenreParams{
-		GenreGenreid: genreID,
-		FilmFilmid:   filmID,
-	})
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return dto.Filmgenre{}, ErrFilmGenreNotFound
-		}
-		return dto.Filmgenre{}, fmt.Errorf("consultar filmgenre genre=%d film=%d: %w", genreID, filmID, err)
-	}
-	return dto.Filmgenre(fg), nil
-}
 
 func (r *SQLCRepository) GetFilmGenres(ctx context.Context) ([]dto.Filmgenre, error) {
 	rows, err := r.queries.GetFilmGenres(ctx)
@@ -72,11 +53,4 @@ func (r *SQLCRepository) Create(ctx context.Context, filmGenre dto.Filmgenre) (d
 		return dto.Filmgenre{}, err
 	}
 	return dto.Filmgenre(fg), nil
-}
-
-func (r *SQLCRepository) Delete(ctx context.Context, genreID int32, filmID int32) error {
-	return r.queries.DeleteFilmGenre(ctx, db.DeleteFilmGenreParams{
-		GenreGenreid: genreID,
-		FilmFilmid:   filmID,
-	})
 }

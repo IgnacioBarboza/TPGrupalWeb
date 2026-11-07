@@ -2,9 +2,21 @@
 
 ## Introducción
 
-TP de la cátedra Programación Web (UNICEN) — API REST HTTP en Go (sobre `:8080`) para gestionar una base de datos de películas: usuarios, films, géneros, reparto, reviews y el estado de visualización de cada usuario por película.
+TP de la cátedra Programación Web (UNICEN). Aplicación web en Go (sobre `:8080`) para gestionar una base de datos de películas: usuarios, films, géneros, reparto, reviews y el estado de visualización de cada usuario por película.
 
-El objetivo del TP es exponer las operaciones CRUD de todas las entidades y relaciones a través de endpoints HTTP estructurados en capas (`handler`, `service`, `repository` y `errors`), junto con su suite de pruebas.
+El renderizado se hace del lado del servidor con **templ**: el servidor Go genera el HTML completo de la página y los formularios hacen `POST` clásicos y recargan la página entera..
+
+## Cómo funciona
+
+| Ruta                     | Qué hace                                                                                                          |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `GET /`                  | Obtiene todos los registros de las 9 entidades (métodos `Get...` de sqlc) y renderiza la página con `views.Index` |
+| `POST /<entidades>`      | Parsea el formulario, crea el registro (métodos `Create...` de sqlc) y redirige a `/` con `303 See Other`         |
+| `GET /static/styles.css` | Hoja de estilos propia (además de Pico.css desde CDN)                                                             |
+
+Rutas de creación: `/films`, `/genres`, `/castmembers`, `/statuses`, `/users`, `/reviews`, `/filmcasts`, `/filmgenres`, `/filmuserstatuses`.
+
+Si los datos del formulario no son válidos (campo vacío, número o fecha con formato incorrecto, estrellas fuera de 1–5, IDs ≤ 0) la respuesta es `400 Bad Request`.
 
 ## Modelo de entidades
 
@@ -19,52 +31,69 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 ├── db/
 │   ├── schema/                # DDL de las tablas (Postgres)
 │   ├── queries/               # Queries .sql usadas por sqlc
-│   └── sqlc/                  # Código Go generado por sqlc
-├── internal/                  # Lógica de la API dividida en capas (handler, service, repository, errors)
-│   ├── film/                  # Endpoints /films y /films/{id}
-│   ├── user/                  # Endpoints /users y /users/{id}
-│   ├── genre/                 # Endpoints /genres y /genres/{id}
-│   ├── status/                # Endpoints /statuses y /statuses/{id}
-│   ├── castmember/            # Endpoints /castmembers y /castmembers/{id}
-│   ├── review/                # Endpoints /reviews y /reviews/{filmID}/{userID}
-│   ├── filmcast/              # Endpoints /filmcasts y /filmcasts/{filmID}/{castMemberID}
-│   ├── filmgenre/             # Endpoints /filmgenres y /filmgenres/{genreID}/{filmID}
-│   └── filmuserstatus/        # Endpoints /filmuserstatuses y /filmuserstatuses/{filmID}/{userID}
+│   └── sqlc/                  # Código Go generado por sqlc (no se versiona)
+├── internal/                  # Lógica dividida en capas (handler (POST de las tablas), service, repository, errors)
+│   ├── dto.go                 # Structs compartidos entre capas y vistas
+│   ├── film/                  
+│   ├── user/                  
+│   ├── genre/                 
+│   ├── status/                
+│   ├── castmember/            
+│   ├── review/                
+│   ├── filmcast/              
+│   ├── filmgenre/             
+│   └── filmuserstatus/        
+├── views/                     # Componentes templ (+ los *_templ.go generados)
+│   ├── layout.templ           # Estructura base (HTML, HEAD con Pico.css, BODY) y página Index
+│   ├── entity_form.templ      # Formularios de creación de cada entidad
+│   └── entity_list.templ      # Listas de registros de cada entidad
+├── static/
+│   └── styles.css             # Hoja de estilos
 ├── CRUDSimple_test.go         # Tests de BD para CRUD simple (Film, User, Genre, Status, CastMember)
 ├── CRUDCompuesto_test.go      # Tests de BD para relaciones (Review, FilmCast, FilmGenre, FilmUserStatus)
-├── requests.bash              # Script de prueba integral de todos los endpoints HTTP con curl
+├── requests.hurl              # Pruebas HTTP de los formularios (Post/Redirect/Get) con Hurl
 ├── Dockerfile
 ├── docker-compose.yml
 ├── Makefile
 ├── sqlc.yaml
 ├── go.mod / go.sum
-└── main.go
+└── main.go                    # Inicializa servicios, registra rutas y renderiza GET /
 ```
 
 ## Requisitos
 
 - Go 1.26+
 - Docker y Docker Compose
-- sqlc
-- `curl` y `bash` (para ejecutar `./requests.bash`)
+- [sqlc](https://sqlc.dev)
+- [templ](https://templ.guide)
+- [Hurl](https://hurl.dev)
 
 ## Setup
 
-1. Clonar el repositorio y hacer checkout sobre el branch correcto (`tp3`):
+1. Clonar el repositorio y hacer checkout sobre el branch `tp5`:
 
 ```bash
-   git clone https://github.com/IgnacioBarboza/TPGrupalWeb/
-   cd TPGrupalWeb
-   git checkout tp3
+git clone https://github.com/IgnacioBarboza/TPGrupalWeb/
+cd TPGrupalWeb
+git checkout tp5
 ```
 
-2. Levantar todo, ejecutar el batch de pruebas HTTP y apagar con un solo comando (copia automáticamente `.env.example` a `.env`):
+
+Hacer todo de una (BD limpia, regenerar sqlc y templ, levantar Docker, correr las pruebas de Hurl y apagar):
 
 ```bash
-   make start
+make start
 ```
 
-Esto copia `.env`, regenera el código de `sqlc`, limpia los volúmenes de la base de datos, construye y levanta los contenedores en segundo plano, ejecuta todas las pruebas HTTP con `./requests.bash` y apaga los contenedores al finalizar.
+2. Alternativamente, levantar el servidor para usarlo desde el navegador (copia `.env.example` a `.env`, genera sqlc si falta y regenera templ):
+
+```bash
+make start-server
+```
+
+Abrir [http://localhost:8080](http://localhost:8080): se ven todas las listas y se pueden crear registros desde los formularios (cada envío recarga la página completa). Para frenarlo: `Ctrl+C` o `make stop-server`.
+
+## Comandos
 
 Para ver todos los comandos disponibles:
 
@@ -74,41 +103,30 @@ make help
 
 Los más usados:
 
-| Comando               | Qué hace                                                              |
-| --------------------- | --------------------------------------------------------------------- |
-| **make start**        | Limpia BD, levanta Docker, corre `requests.bash` y apaga (all-in-one) |
-| **make StartServer**  | Levanta el servidor en primer plano para pruebas manuales             |
-| **make StopServer**   | Frena el servidor conservando los datos de la BD                      |
-| **make cleanDB**      | Frena el servidor y borra los volúmenes de la BD (reinicia IDs)       |
-| **make test**         | Ejecuta `go test` dentro del contenedor                               |
-| **make upDocker**     | Inicia los contenedores en segundo plano                              |
-| **make downDocker**   | Frena los contenedores                                                |
-| **make rebuild**      | Reconstruye y levanta los contenedores                                |
-| **make generatesqlc** | Borra y regenera el código de `sqlc` en `db/sqlc/`                    |
+| Comando                 | Qué hace                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------- |
+| **make start**          | Limpia BD, regenera sqlc y templ, levanta Docker, corre `requests.hurl` y apaga |
+| **make start-server**   | Regenera templ y levanta el servidor en primer plano                            |
+| **make stop-server**    | Frena el servidor conservando los datos de la BD                                |
+| **make clean-db**       | Frena el servidor y borra los volúmenes de la BD (reinicia IDs)                 |
+| **make test**           | Ejecuta `go test` dentro del contenedor                                         |
+| **make generate-templ** | Borra y regenera los `*_templ.go` de `views/`                                   |
+| **make generate-sqlc**  | Borra y regenera el código de `sqlc` en `db/sqlc/`                              |
+| **make rebuild**        | Reconstruye y levanta los contenedores                                          |
 
 ## Tests
 
-El proyecto cuenta con dos tipos de pruebas:
+### Pruebas HTTP de los formularios (`requests.hurl`) — _incluidas en `make start`_
 
-### 1. Pruebas de Endpoints HTTP (`requests.bash`) — _Incluidas en `make start`_
+Prueban el patrón Post/Redirect/Get de las 9 entidades en `http://localhost:8080`:
 
-Prueba el conjunto completo de "curl" (`POST` unitario, `POST` masivo, `GET` colección, `GET` por ID/clave compuesta, `PUT` y `DELETE`) sobre las 9 entidades de la API en `http://localhost:8080`, informando y contando si hubo algún error HTTP (`4xx`/`5xx`).
+- cada `POST /<entidades>` válido debe responder `303` con `Location: /`;
+- los `POST` inválidos deben responder `400`;
+- después, `GET /` debe mostrar el registro creado. Los IDs se capturan del HTML para crear las relaciones (FilmCast, FilmGenre, FilmUserStatus y Review).
 
-Si tenés el servidor levantado con `make StartServer`, también podés correrlo manualmente:
-
-```bash
-./requests.bash
-```
-
-### 2. Tests de capa de datos en Go (`go test`)
-
-Prueban directamente las consultas de `sqlc` contra Postgres dentro del contenedor (con los contenedores levantados):
+Con el servidor levantado (`make start-server`) también se pueden correr a mano:
 
 ```bash
-make test
+hurl --test requests.hurl
 ```
 
-Están separados en dos archivos:
-
-- **CRUDSimple_test.go**: CRUD de entidades con clave simple (`Film`, `User`, `Genre`, `Status`, `CastMember`).
-- **CRUDCompuesto_test.go**: CRUD sobre las tablas de relación con clave compuesta (`Review`, `FilmCast`, `FilmGenre`, `FilmUserStatus`).

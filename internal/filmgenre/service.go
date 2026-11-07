@@ -21,10 +21,6 @@ func NewFilmGenreService(repo FilmGenreRepository) *FilmGenreService {
 	return &FilmGenreService{repo: repo}
 }
 
-func (s *FilmGenreService) GetFilmGenre(ctx context.Context, genreID int32, filmID int32) (dto.Filmgenre, error) {
-	return s.repo.GetFilmGenre(ctx, genreID, filmID)
-}
-
 func (s *FilmGenreService) GetFilmGenres(ctx context.Context) ([]dto.Filmgenre, error) {
 	return s.repo.GetFilmGenres(ctx)
 }
@@ -42,30 +38,4 @@ func validateFilmGenre(filmGenre dto.Filmgenre) error {
 		return ErrInvalidFilmGenreIDs
 	}
 	return nil
-}
-
-func (s *FilmGenreService) CreateMultipleFilmGenres(ctx context.Context, filmGenres []dto.Filmgenre) ([]dto.Filmgenre, error) {
-	if len(filmGenres) == 0 {
-		return nil, ErrInvalidFilmGenre
-	}
-	// Valida todos
-	for _, fg := range filmGenres {
-		if err := validateFilmGenre(fg); err != nil {
-			return nil, err
-		}
-	}
-
-	created := make([]dto.Filmgenre, 0, len(filmGenres))
-	for _, fg := range filmGenres {
-		c, err := s.repo.Create(ctx, fg)
-		if err != nil {
-			return nil, err
-		}
-		created = append(created, c)
-	}
-	return created, nil
-}
-
-func (s *FilmGenreService) Delete(ctx context.Context, genreID int32, filmID int32) error {
-	return s.repo.Delete(ctx, genreID, filmID)
 }

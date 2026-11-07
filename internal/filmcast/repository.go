@@ -12,18 +12,13 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
-	"database/sql"
-	"errors"
-	"fmt"
 )
 
 // Interfaz
 // FilmCast es una tabla de union sin campos propios, por lo que no tiene operacion Update.
 type FilmCastRepository interface {
-	GetFilmCast(ctx context.Context, filmID int32, castMemberID int32) (dto.Filmcast, error)
 	GetFilmCasts(ctx context.Context) ([]dto.Filmcast, error)
 	Create(ctx context.Context, filmCast dto.Filmcast) (dto.Filmcast, error)
-	Delete(ctx context.Context, filmID int32, castMemberID int32) error
 }
 
 type SQLCRepository struct {
@@ -36,20 +31,6 @@ func NewSQLCRepository(q *db.Queries) *SQLCRepository {
 }
 
 // A partir de aca, implementaciones:
-
-func (r *SQLCRepository) GetFilmCast(ctx context.Context, filmID int32, castMemberID int32) (dto.Filmcast, error) {
-	fc, err := r.queries.GetFilmCast(ctx, db.GetFilmCastParams{
-		Filmid:       filmID,
-		Castmemberid: castMemberID,
-	})
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return dto.Filmcast{}, ErrFilmCastNotFound
-		}
-		return dto.Filmcast{}, fmt.Errorf("consultar filmcast film=%d cast=%d: %w", filmID, castMemberID, err)
-	}
-	return dto.Filmcast(fc), nil
-}
 
 func (r *SQLCRepository) GetFilmCasts(ctx context.Context) ([]dto.Filmcast, error) {
 	rows, err := r.queries.GetFilmCasts(ctx)
@@ -72,11 +53,4 @@ func (r *SQLCRepository) Create(ctx context.Context, filmCast dto.Filmcast) (dto
 		return dto.Filmcast{}, err
 	}
 	return dto.Filmcast(fc), nil
-}
-
-func (r *SQLCRepository) Delete(ctx context.Context, filmID int32, castMemberID int32) error {
-	return r.queries.DeleteFilmCast(ctx, db.DeleteFilmCastParams{
-		Filmid:       filmID,
-		Castmemberid: castMemberID,
-	})
 }

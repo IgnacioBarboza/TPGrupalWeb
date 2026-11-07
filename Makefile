@@ -1,6 +1,9 @@
 # Si el usuario no envia parametros, corre esto
 .DEFAULT_GOAL := help
 
+.PHONY: help start start-server stop-server clean-db test up-docker down-docker build-docker rebuild \
+	check-sqlc generate-sqlc delete-sqlc generate-templ delete-templ copy-env clean
+
 # Variables
 APP_NAME := app
 SQLC_GENERATED := $(shell ls ./db/sqlc 2>/dev/null || echo "")
@@ -22,10 +25,21 @@ delete-sqlc:
 	rm -rf db/sqlc
 
 # Elimina sqlc anterior y lo regenera desde cero
-generatesqlc: delete-sqlc 
+generate-sqlc: delete-sqlc
 	@echo "Sqlc anterior eliminado"
-	@make check-sqlc
+	@$(MAKE) check-sqlc
 	@echo "Nuevo sqlc generado"
+
+# Elimina los archivos .go generados por templ en views/
+delete-templ:
+	@echo "DEBUG delete-templ"
+	rm -f views/*_templ.go
+
+# Elimina templ anterior y lo regenera desde cero
+generate-templ: delete-templ
+	@echo "DEBUG generate-templ"
+	$(TEMPL) generate -path ./views
+	@echo "Nuevo templ generado"
 
 # Ejecuta los tests de Go en el contenedor (se borra al terminar)
 test:
@@ -33,24 +47,19 @@ test:
 	docker compose run --rm api go test -v
 
 # Levanta los contenedores en segundo plano
-upDocker:
-	@echo "DEBUG upDocker"
+up-docker:
+	@echo "DEBUG up-docker"
 	docker compose up -d
 
 # Construye las imágenes de Docker
-buildDocker:
-	@echo "DEBUG buildDocker"
+build-docker:
+	@echo "DEBUG build-docker"
 	docker compose build
 
 # Frena y elimina los contenedores
-downDocker:
-	@echo "DEBUG downDocker"
+down-docker:
+	@echo "DEBUG down-docker"
 	docker compose down
-
-# Frena los contenedores y elimina los volúmenes
-cleanVolumenes:
-	@echo "DEBUG cleanVolumenes"
-	docker compose down -v
 
 # Elimina el binario y archivos temporales
 clean:
@@ -59,71 +68,66 @@ clean:
 	rm -rf tmp/
 
 # Baja los contenedores y los reconstruye
-rebuild: downDocker
+rebuild: down-docker
 	@echo "DEBUG rebuild"
-	docker compose up -d --build    
+	docker compose up -d --build
 
 # Copia las variables de entorno de ejemplo
-copyEnv:
+copy-env:
 	cp .env.example .env
 
-# Elimina los archivos .go generados por templ en views/
-delete-templ:
-	@echo "DEBUG delete-templ"
-	rm -f views/*_templ.go
-
-# Elimina templ anterior y lo regenera desde cero
-generatetempl: delete-templ
-	@echo "DEBUG generatetempl"
-	$(TEMPL) generate -path ./views
-	@echo "Nuevo templ generado"
-
-# Limpia la BD, regenera sqlc, levanta Docker, corre requests.bash y apaga
-start: copyEnv generatesqlc generatetempl cleanDB
+# Limpia la BD, regenera sqlc y templ, levanta Docker, corre requests.hurl y apaga
+start: copy-env generate-sqlc generate-templ clean-db
 	@echo "Limpiando e iniciando Docker"
-	@docker compose up --build -d 
-	@echo "Ejecutando batch de testing de Curls"
-	@./requests.bash
+	@docker compose up --build -d
+	@echo "Ejecutando tests de Hurl"
+	@hurl --test requests.hurl
 	@echo "Testeos finalizados"
 	@echo "Limpiando y apagando"
 	@docker compose down >/dev/null 2>&1
 
-# Levanta el servidor en primer plano para pruebas manuales
-StartServer: copyEnv check-sqlc
-	@echo "\n=== Iniciando Servidor de Pruebas ==="
+# Regenera templ y levanta el servidor en primer plano para pruebas manuales
+start-server: copy-env check-sqlc generate-templ
+	@echo "=== Iniciando Servidor de Pruebas ==="
 	@docker compose up --build
 
 # Frena el servidor sin borrar los datos de la BD
-StopServer:
-	@echo "\n=== Apagando Servidor ==="
+stop-server:
+	@echo "=== Apagando Servidor ==="
 	@docker compose down >/dev/null 2>&1
 	@echo "=== Finalizado ==="
 
 # Frena el servidor y borra los volúmenes de la BD para empezar de cero
-cleanDB:
-	@echo "\n=== Limpiando Base de Datos (volúmenes) ==="
+clean-db:
+	@echo "=== Limpiando Base de Datos (volúmenes) ==="
 	@docker compose down -v >/dev/null 2>&1
 	@echo "=== Base de Datos Limpia ==="
-
 
 help:
 	@echo "Posibles Comandos:"
 	@echo ""
-	@echo "  help             Muestra esta ayuda"
-	@echo "  start            Limpia BD, levanta Docker, corre requests.bash y apaga"
-	@echo "  StartServer      Levanta el servidor para pruebas manuales"
-	@echo "  StopServer       Frena el servidor (conserva datos de la BD)"
-	@echo "  cleanDB          Frena el servidor y borra los datos de la BD"
-	@echo "  test             Ejecuta 'go test' dentro del contenedor"
-	@echo "  upDocker         Inicia los contenedores en segundo plano"
-	@echo "  downDocker       Frena los contenedores"
-	@echo "  buildDocker      Construye las imágenes de Docker"
-	@echo "  rebuild          Reconstruye y levanta los contenedores"
-	@echo "  check-sqlc       Genera el código de sqlc si no existe"
-	@echo "  generatesqlc     Borra y regenera el código de sqlc"
-	@echo "  delete-sqlc      Elimina la carpeta db/sqlc"
-	@echo "  generatetempl    Borra y regenera los .go de views/ con templ"
-	@echo "  delete-templ     Elimina los *_templ.go de views/"
-	@echo "  copyEnv          Copia .env.example a .env"
-	@echo "  clean            Elimina binarios y temporales locales"
+	@echo "  Uso general:"
+	@echo "    help             Muestra esta ayuda"
+	@echo "    start            Limpia BD, regenera sqlc y templ, levanta Docker, corre requests.hurl y apaga"
+	@echo "    start-server     Regenera templ y levanta el servidor en http://localhost:8080"
+	@echo "    stop-server      Frena el servidor (conserva datos de la BD)"
+	@echo "    clean-db         Frena el servidor y borra los datos de la BD"
+	@echo "    test             Ejecuta 'go test' dentro del contenedor"
+	@echo ""
+	@echo "  Docker:"
+	@echo "    up-docker        Inicia los contenedores en segundo plano"
+	@echo "    down-docker      Frena los contenedores"
+	@echo "    build-docker     Construye las imágenes de Docker"
+	@echo "    rebuild          Reconstruye y levanta los contenedores"
+	@echo ""
+	@echo "  Generación de código:"
+	@echo "    check-sqlc       Genera el código de sqlc si no existe"
+	@echo "    generate-sqlc    Borra y regenera el código de sqlc"
+	@echo "    delete-sqlc      Elimina la carpeta db/sqlc"
+	@echo "    generate-templ   Borra y regenera los *_templ.go de views/"
+	@echo "    delete-templ     Elimina los *_templ.go de views/"
+	@echo ""
+	@echo "  Otros:"
+	@echo "    copy-env         Copia .env.example a .env"
+	@echo "    clean            Elimina binarios y temporales locales"
 	@echo ""
