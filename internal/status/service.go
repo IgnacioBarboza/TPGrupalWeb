@@ -39,3 +39,21 @@ func validateStatus(status dto.Status) error {
 	}
 	return nil
 }
+
+// Delete borra el estado.
+func (s *StatusService) Delete(ctx context.Context, id int32) error {
+	return s.repo.Delete(ctx, id)
+}
+
+// Get devuelve el estado.
+func (s *StatusService) Get(ctx context.Context, id int32) (dto.Status, error) {
+	return s.repo.Get(ctx, id)
+}
+
+// Update valida el estado con las mismas reglas que Create y guarda los cambios.
+func (s *StatusService) Update(ctx context.Context, status dto.Status) error {
+	if err := validateStatus(status); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, status)
+}

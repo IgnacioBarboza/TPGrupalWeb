@@ -62,6 +62,11 @@ FROM FilmCast;
 DELETE FROM FilmCast
 WHERE FIlmId = $1 AND CastMemberId = $2;
 
+-- name: UpdateFilmCast :exec
+UPDATE FilmCast
+SET FIlmId = sqlc.arg(new_film_id), CastMemberId = sqlc.arg(new_cast_member_id)
+WHERE FIlmId = sqlc.arg(film_id) AND CastMemberId = sqlc.arg(cast_member_id);
+
 -- name: CreateFilmGenre :one
 INSERT INTO FilmGenre(Genre_GenreID, Film_FilmId)
 VALUES($1, $2)
@@ -79,6 +84,11 @@ FROM FilmGenre;
 -- name: DeleteFilmGenre :exec
 DELETE FROM FilmGenre
 WHERE Genre_GenreID = $1 AND Film_FilmId = $2;
+
+-- name: UpdateFilmGenre :exec
+UPDATE FilmGenre
+SET Genre_GenreID = sqlc.arg(new_genre_id), Film_FilmId = sqlc.arg(new_film_id)
+WHERE Genre_GenreID = sqlc.arg(genre_id) AND Film_FilmId = sqlc.arg(film_id);
 
 -- name: CreateFilmUserStatus :one
 INSERT INTO FilmUserStatus(Status_StatusId, Film_FilmId, User_UserID)

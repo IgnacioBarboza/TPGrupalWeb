@@ -1,7 +1,7 @@
 # Si el usuario no envia parametros, corre esto
 .DEFAULT_GOAL := help
 
-.PHONY: help start start-server stop-server clean-db test up-docker down-docker build-docker rebuild \
+.PHONY: help start start-server stop-server clean-db up-docker down-docker build-docker rebuild \
 	check-sqlc generate-sqlc delete-sqlc generate-templ delete-templ copy-env clean
 
 # Variables
@@ -41,11 +41,6 @@ generate-templ: delete-templ
 	$(TEMPL) generate -path ./views
 	@echo "Nuevo templ generado"
 
-# Ejecuta los tests de Go en el contenedor (se borra al terminar)
-test:
-	@echo "DEBUG Testeo"
-	docker compose run --rm api go test -v
-
 # Levanta los contenedores en segundo plano
 up-docker:
 	@echo "DEBUG up-docker"
@@ -76,16 +71,6 @@ rebuild: down-docker
 copy-env:
 	cp .env.example .env
 
-# Limpia la BD, regenera sqlc y templ, levanta Docker, corre requests.hurl y apaga
-start: copy-env generate-sqlc generate-templ clean-db
-	@echo "Limpiando e iniciando Docker"
-	@docker compose up --build -d
-	@echo "Ejecutando tests de Hurl"
-	@hurl --test requests.hurl
-	@echo "Testeos finalizados"
-	@echo "Limpiando y apagando"
-	@docker compose down >/dev/null 2>&1
-
 # Regenera templ y levanta el servidor en primer plano para pruebas manuales
 start-server: copy-env check-sqlc generate-templ
 	@echo "=== Iniciando Servidor de Pruebas ==="
@@ -108,11 +93,9 @@ help:
 	@echo ""
 	@echo "  Uso general:"
 	@echo "    help             Muestra esta ayuda"
-	@echo "    start            Limpia BD, regenera sqlc y templ, levanta Docker, corre requests.hurl y apaga"
 	@echo "    start-server     Regenera templ y levanta el servidor en http://localhost:8080"
 	@echo "    stop-server      Frena el servidor (conserva datos de la BD)"
 	@echo "    clean-db         Frena el servidor y borra los datos de la BD"
-	@echo "    test             Ejecuta 'go test' dentro del contenedor"
 	@echo ""
 	@echo "  Docker:"
 	@echo "    up-docker        Inicia los contenedores en segundo plano"

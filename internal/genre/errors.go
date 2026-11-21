@@ -4,4 +4,5 @@ import "errors"
 
 var (
 	ErrInvalidGenreNameEmpty = errors.New("El nombre del género no puede estar vacío.")
+	ErrGenreNotFound         = errors.New("El género no existe.")
 )

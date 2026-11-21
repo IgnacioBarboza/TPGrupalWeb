@@ -79,7 +79,8 @@ CREATE TABLE "User" (
 -- Reference: FK_Cast_CastMember (table: FilmCast)
 ALTER TABLE FilmCast ADD CONSTRAINT FK_Cast_CastMember
     FOREIGN KEY (CastMemberId)
-    REFERENCES CastMember (CastMemberId)  
+    REFERENCES CastMember (CastMemberId)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -87,7 +88,8 @@ ALTER TABLE FilmCast ADD CONSTRAINT FK_Cast_CastMember
 -- Reference: FK_Cast_Film (table: FilmCast)
 ALTER TABLE FilmCast ADD CONSTRAINT FK_Cast_Film
     FOREIGN KEY (FIlmId)
-    REFERENCES Film (FilmId)  
+    REFERENCES Film (FilmId)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -95,7 +97,8 @@ ALTER TABLE FilmCast ADD CONSTRAINT FK_Cast_Film
 -- Reference: FilmGenre_Film (table: FilmGenre)
 ALTER TABLE FilmGenre ADD CONSTRAINT FilmGenre_Film
     FOREIGN KEY (Film_FilmId)
-    REFERENCES Film (FilmId)  
+    REFERENCES Film (FilmId)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -103,7 +106,8 @@ ALTER TABLE FilmGenre ADD CONSTRAINT FilmGenre_Film
 -- Reference: FilmGenre_Genre (table: FilmGenre)
 ALTER TABLE FilmGenre ADD CONSTRAINT FilmGenre_Genre
     FOREIGN KEY (Genre_GenreID)
-    REFERENCES Genre (GenreID)  
+    REFERENCES Genre (GenreID)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -111,7 +115,8 @@ ALTER TABLE FilmGenre ADD CONSTRAINT FilmGenre_Genre
 -- Reference: FilmUserStatus_Film (table: FilmUserStatus)
 ALTER TABLE FilmUserStatus ADD CONSTRAINT FilmUserStatus_Film
     FOREIGN KEY (Film_FilmId)
-    REFERENCES Film (FilmId)  
+    REFERENCES Film (FilmId)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -119,7 +124,8 @@ ALTER TABLE FilmUserStatus ADD CONSTRAINT FilmUserStatus_Film
 -- Reference: FilmUserStatus_Status (table: FilmUserStatus)
 ALTER TABLE FilmUserStatus ADD CONSTRAINT FilmUserStatus_Status
     FOREIGN KEY (Status_StatusId)
-    REFERENCES Status (StatusId)  
+    REFERENCES Status (StatusId)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -127,7 +133,8 @@ ALTER TABLE FilmUserStatus ADD CONSTRAINT FilmUserStatus_Status
 -- Reference: FilmUserStatus_User (table: FilmUserStatus)
 ALTER TABLE FilmUserStatus ADD CONSTRAINT FilmUserStatus_User
     FOREIGN KEY (User_UserID)
-    REFERENCES "User" (UserID)  
+    REFERENCES "User" (UserID)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -135,7 +142,8 @@ ALTER TABLE FilmUserStatus ADD CONSTRAINT FilmUserStatus_User
 -- Reference: Review_Film (table: Review)
 ALTER TABLE Review ADD CONSTRAINT Review_Film
     FOREIGN KEY (ReviewFilmId)
-    REFERENCES Film (FilmId)  
+    REFERENCES Film (FilmId)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -143,7 +151,8 @@ ALTER TABLE Review ADD CONSTRAINT Review_Film
 -- Reference: Review_User (table: Review)
 ALTER TABLE Review ADD CONSTRAINT Review_User
     FOREIGN KEY (ReviewUserID)
-    REFERENCES "User" (UserID)  
+    REFERENCES "User" (UserID)
+    ON DELETE CASCADE
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;

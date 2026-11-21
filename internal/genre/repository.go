@@ -12,12 +12,17 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
+	"database/sql"
+	"errors"
 )
 
 // Interfaz
 type GenreRepository interface {
 	GetGenres(ctx context.Context) ([]dto.Genre, error)
 	Create(ctx context.Context, genre dto.Genre) (dto.Genre, error)
+	Delete(ctx context.Context, id int32) error
+	Get(ctx context.Context, id int32) (dto.Genre, error)
+	Update(ctx context.Context, genre dto.Genre) error
 }
 
 type SQLCRepository struct {
@@ -49,4 +54,29 @@ func (r *SQLCRepository) Create(ctx context.Context, genre dto.Genre) (dto.Genre
 		return dto.Genre{}, err
 	}
 	return dto.Genre{Genreid: row.Genreid, Genrename: row.Genrename}, nil
+}
+
+// Delete borra el género con la query DeleteGenre de sqlc.
+func (r *SQLCRepository) Delete(ctx context.Context, id int32) error {
+	return r.queries.DeleteGenre(ctx, id)
+}
+
+// Get devuelve el género, o ErrGenreNotFound si no existe.
+func (r *SQLCRepository) Get(ctx context.Context, id int32) (dto.Genre, error) {
+	row, err := r.queries.GetGenre(ctx, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return dto.Genre{}, ErrGenreNotFound
+	}
+	if err != nil {
+		return dto.Genre{}, err
+	}
+	return dto.Genre{Genreid: row.Genreid, Genrename: row.Genrename}, nil
+}
+
+// Update guarda los cambios de el género con la query UpdateGenre de sqlc.
+func (r *SQLCRepository) Update(ctx context.Context, genre dto.Genre) error {
+	return r.queries.UpdateGenre(ctx, db.UpdateGenreParams{
+		Genreid:   genre.Genreid,
+		Genrename: genre.Genrename,
+	})
 }

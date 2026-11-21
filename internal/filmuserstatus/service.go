@@ -39,3 +39,21 @@ func validateFilmUserStatus(fus dto.Filmuserstatus) error {
 	}
 	return nil
 }
+
+// Delete borra el estado de la película para el usuario.
+func (s *FilmUserStatusService) Delete(ctx context.Context, filmID, userID int32) error {
+	return s.repo.Delete(ctx, filmID, userID)
+}
+
+// Get devuelve el estado de la película para el usuario.
+func (s *FilmUserStatusService) Get(ctx context.Context, filmID, userID int32) (dto.Filmuserstatus, error) {
+	return s.repo.Get(ctx, filmID, userID)
+}
+
+// Update valida el estado de la película para el usuario con las mismas reglas que Create y guarda los cambios.
+func (s *FilmUserStatusService) Update(ctx context.Context, fus dto.Filmuserstatus) error {
+	if err := validateFilmUserStatus(fus); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, fus)
+}

@@ -1,43 +1,116 @@
-:root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --border: #e5e7eb;
-  --text: #1f2937;
-  --muted: #6b7280;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --danger: #dc2626;
-  --radius: 10px;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px rgb(0 0 0 / 0.04);
+/*
+  Ajustes sobre Pico.css: se redefinen sus variables para tener una paleta sobria
+  (azul marino y grises) y tipografía de sistema. Los dos selectores igualan la
+  especificidad de Pico en modo claro y oscuro, así la página se ve siempre igual.
+*/
+:root:not([data-theme=dark]),
+:root:not([data-theme]) {
+  --pico-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --pico-font-size: 100%;
+  --pico-line-height: 1.55;
+  --pico-border-radius: 6px;
+
+  --pico-background-color: #f4f5f7;
+  --pico-color: #1f2933;
+  --pico-muted-color: #5f6b7a;
+  --pico-muted-border-color: #dde1e6;
+  --pico-h1-color: #14213d;
+  --pico-h2-color: #14213d;
+
+  --pico-primary: #1e3a5f;
+  --pico-primary-background: #1e3a5f;
+  --pico-primary-border: #1e3a5f;
+  --pico-primary-hover: #152c49;
+  --pico-primary-hover-background: #152c49;
+  --pico-primary-hover-border: #152c49;
+  --pico-primary-focus: rgb(30 58 95 / 0.25);
+  --pico-primary-inverse: #ffffff;
+
+  --pico-form-element-background-color: #ffffff;
+  --pico-form-element-border-color: #c9ced6;
+  --pico-form-element-focus-color: #1e3a5f;
+
+  color-scheme: light;
 }
 
-body {
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  background: var(--bg);
-  color: var(--text);
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
 }
 
-h1 { letter-spacing: -0.02em; font-weight: 700; }
+h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
 
+/* Cada entidad en una tarjeta blanca; la tarjeta ya separa, así que el <hr> sobra. */
 section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: #ffffff;
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-label { font-weight: 500; color: var(--muted); }
-
-input, textarea {
-  transition: border-color .15s, box-shadow .15s;
-}
-input:focus-visible, textarea:focus-visible {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.15);
+main > hr {
+  display: none;
 }
 
-button { transition: background-color .15s, transform .05s; }
-button:active { transform: translateY(1px); }
+label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--pico-muted-color);
+}
+
+/* Filas de las listas: texto a la izquierda y botones chicos al lado. */
+section ul {
+  padding-left: 0;
+}
+
+/* Dentro de las filas, controles más compactos: se achican las variables de espaciado de Pico. */
+section li {
+  list-style: none;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+  --pico-form-element-spacing-vertical: 0.3rem;
+  --pico-form-element-spacing-horizontal: 0.8rem;
+}
+
+section li:last-child {
+  border-bottom: none;
+}
+
+/* [type] iguala la especificidad de Pico, que ensancha los [type=submit] al 100 %. */
+section li button[type] {
+  width: auto;
+  font-size: 0.85rem;
+}
+
+section li > button[type] {
+  margin: 0 0 0 0.5rem;
+}
+
+section li form button[type] {
+  margin: 0 0.5rem 0 0;
+}
+
+/* Borrar en rojo sobrio para que no se confunda con Editar. */
+section li button[hx-delete] {
+  background: transparent;
+  border-color: #b42318;
+  color: #b42318;
+}
+
+section li button[hx-delete]:hover {
+  background: #b42318;
+  color: #ffffff;
+}
+
+/* Mensajes de error que el servidor devuelve a los <p id="error-..."> (hx-status). */
+p[id^="error-"] {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #b42318;
+}

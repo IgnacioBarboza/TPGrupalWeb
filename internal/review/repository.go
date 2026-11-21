@@ -12,12 +12,17 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
+	"database/sql"
+	"errors"
 )
 
 // Interfaz
 type ReviewRepository interface {
 	GetReviews(ctx context.Context) ([]dto.Review, error)
 	Create(ctx context.Context, review dto.Review) (dto.Review, error)
+	Delete(ctx context.Context, filmID, userID int32) error
+	Get(ctx context.Context, filmID, userID int32) (dto.Review, error)
+	Update(ctx context.Context, review dto.Review) error
 }
 
 type SQLCRepository struct {
@@ -54,4 +59,31 @@ func (r *SQLCRepository) Create(ctx context.Context, review dto.Review) (dto.Rev
 		return dto.Review{}, err
 	}
 	return dto.Review(rev), nil
+}
+
+// Delete borra la reseña con la query DeleteReview de sqlc.
+func (r *SQLCRepository) Delete(ctx context.Context, filmID, userID int32) error {
+	return r.queries.DeleteReview(ctx, db.DeleteReviewParams{Reviewfilmid: filmID, Reviewuserid: userID})
+}
+
+// Get devuelve la reseña, o ErrReviewNotFound si no existe.
+func (r *SQLCRepository) Get(ctx context.Context, filmID, userID int32) (dto.Review, error) {
+	rv, err := r.queries.GetReview(ctx, db.GetReviewParams{Reviewfilmid: filmID, Reviewuserid: userID})
+	if errors.Is(err, sql.ErrNoRows) {
+		return dto.Review{}, ErrReviewNotFound
+	}
+	if err != nil {
+		return dto.Review{}, err
+	}
+	return dto.Review(rv), nil
+}
+
+// Update guarda los cambios de la reseña con la query UpdateReview de sqlc.
+func (r *SQLCRepository) Update(ctx context.Context, review dto.Review) error {
+	return r.queries.UpdateReview(ctx, db.UpdateReviewParams{
+		Reviewfilmid:      review.Reviewfilmid,
+		Reviewuserid:      review.Reviewuserid,
+		Reviewstars:       review.Reviewstars,
+		Reviewdescription: review.Reviewdescription,
+	})
 }

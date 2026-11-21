@@ -802,6 +802,52 @@ func (q *Queries) UpdateFilm(ctx context.Context, arg UpdateFilmParams) error {
 	return err
 }
 
+const updateFilmCast = `-- name: UpdateFilmCast :exec
+UPDATE FilmCast
+SET FIlmId = $1, CastMemberId = $2
+WHERE FIlmId = $3 AND CastMemberId = $4
+`
+
+type UpdateFilmCastParams struct {
+	NewFilmID       int32 `json:"new_film_id"`
+	NewCastMemberID int32 `json:"new_cast_member_id"`
+	FilmID          int32 `json:"film_id"`
+	CastMemberID    int32 `json:"cast_member_id"`
+}
+
+func (q *Queries) UpdateFilmCast(ctx context.Context, arg UpdateFilmCastParams) error {
+	_, err := q.db.ExecContext(ctx, updateFilmCast,
+		arg.NewFilmID,
+		arg.NewCastMemberID,
+		arg.FilmID,
+		arg.CastMemberID,
+	)
+	return err
+}
+
+const updateFilmGenre = `-- name: UpdateFilmGenre :exec
+UPDATE FilmGenre
+SET Genre_GenreID = $1, Film_FilmId = $2
+WHERE Genre_GenreID = $3 AND Film_FilmId = $4
+`
+
+type UpdateFilmGenreParams struct {
+	NewGenreID int32 `json:"new_genre_id"`
+	NewFilmID  int32 `json:"new_film_id"`
+	GenreID    int32 `json:"genre_id"`
+	FilmID     int32 `json:"film_id"`
+}
+
+func (q *Queries) UpdateFilmGenre(ctx context.Context, arg UpdateFilmGenreParams) error {
+	_, err := q.db.ExecContext(ctx, updateFilmGenre,
+		arg.NewGenreID,
+		arg.NewFilmID,
+		arg.GenreID,
+		arg.FilmID,
+	)
+	return err
+}
+
 const updateFilmUserStatus = `-- name: UpdateFilmUserStatus :exec
 UPDATE FilmUserStatus
 SET Status_StatusId = $3

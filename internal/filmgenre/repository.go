@@ -12,6 +12,8 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
+	"database/sql"
+	"errors"
 )
 
 // Interfaz
@@ -19,6 +21,9 @@ import (
 type FilmGenreRepository interface {
 	GetFilmGenres(ctx context.Context) ([]dto.Filmgenre, error)
 	Create(ctx context.Context, filmGenre dto.Filmgenre) (dto.Filmgenre, error)
+	Delete(ctx context.Context, genreID, filmID int32) error
+	Get(ctx context.Context, genreID, filmID int32) (dto.Filmgenre, error)
+	Update(ctx context.Context, genreID, filmID int32, filmGenre dto.Filmgenre) error
 }
 
 type SQLCRepository struct {
@@ -53,4 +58,31 @@ func (r *SQLCRepository) Create(ctx context.Context, filmGenre dto.Filmgenre) (d
 		return dto.Filmgenre{}, err
 	}
 	return dto.Filmgenre(fg), nil
+}
+
+// Delete borra la relación película-género con la query DeleteFilmGenre de sqlc.
+func (r *SQLCRepository) Delete(ctx context.Context, genreID, filmID int32) error {
+	return r.queries.DeleteFilmGenre(ctx, db.DeleteFilmGenreParams{GenreGenreid: genreID, FilmFilmid: filmID})
+}
+
+// Get devuelve la relación película-género, o ErrFilmGenreNotFound si no existe.
+func (r *SQLCRepository) Get(ctx context.Context, genreID, filmID int32) (dto.Filmgenre, error) {
+	row, err := r.queries.GetFilmGenre(ctx, db.GetFilmGenreParams{GenreGenreid: genreID, FilmFilmid: filmID})
+	if errors.Is(err, sql.ErrNoRows) {
+		return dto.Filmgenre{}, ErrFilmGenreNotFound
+	}
+	if err != nil {
+		return dto.Filmgenre{}, err
+	}
+	return dto.Filmgenre(row), nil
+}
+
+// Update reemplaza el par (genreID, filmID) por el de filmGenre, con la query UpdateFilmGenre de sqlc.
+func (r *SQLCRepository) Update(ctx context.Context, genreID, filmID int32, filmGenre dto.Filmgenre) error {
+	return r.queries.UpdateFilmGenre(ctx, db.UpdateFilmGenreParams{
+		NewGenreID: filmGenre.GenreGenreid,
+		NewFilmID:  filmGenre.FilmFilmid,
+		GenreID:    genreID,
+		FilmID:     filmID,
+	})
 }

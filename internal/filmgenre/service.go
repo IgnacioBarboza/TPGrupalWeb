@@ -39,3 +39,21 @@ func validateFilmGenre(filmGenre dto.Filmgenre) error {
 	}
 	return nil
 }
+
+// Delete borra la relación película-género.
+func (s *FilmGenreService) Delete(ctx context.Context, genreID, filmID int32) error {
+	return s.repo.Delete(ctx, genreID, filmID)
+}
+
+// Get devuelve la relación película-género.
+func (s *FilmGenreService) Get(ctx context.Context, genreID, filmID int32) (dto.Filmgenre, error) {
+	return s.repo.Get(ctx, genreID, filmID)
+}
+
+// Update valida el par nuevo con las mismas reglas que Create y reemplaza al par (genreID, filmID).
+func (s *FilmGenreService) Update(ctx context.Context, genreID, filmID int32, filmGenre dto.Filmgenre) error {
+	if err := validateFilmGenre(filmGenre); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, genreID, filmID, filmGenre)
+}

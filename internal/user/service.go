@@ -45,3 +45,21 @@ func validateUser(user dto.User) error {
 	}
 	return nil
 }
+
+// Delete borra el usuario.
+func (s *UserService) Delete(ctx context.Context, id int32) error {
+	return s.repo.Delete(ctx, id)
+}
+
+// Get devuelve el usuario.
+func (s *UserService) Get(ctx context.Context, id int32) (dto.User, error) {
+	return s.repo.Get(ctx, id)
+}
+
+// Update valida el usuario con las mismas reglas que Create y guarda los cambios.
+func (s *UserService) Update(ctx context.Context, user dto.User) error {
+	if err := validateUser(user); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, user)
+}

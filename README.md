@@ -4,19 +4,26 @@
 
 TP de la cátedra Programación Web (UNICEN). Aplicación web en Go (sobre `:8080`) para gestionar una base de datos de películas: usuarios, films, géneros, reparto, reviews y el estado de visualización de cada usuario por película.
 
-El renderizado se hace del lado del servidor con **templ**: el servidor Go genera el HTML completo de la página y los formularios hacen `POST` clásicos y recargan la página entera..
+El renderizado se hace del lado del servidor con **templ**, y desde el TP6 usamos HTMX para que la página no se recargue: crear, editar y borrar actualizan solo el pedazo de HTML que cambia (una lista o una fila).
 
 ## Cómo funciona
 
-| Ruta                     | Qué hace                                                                                                          |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `GET /`                  | Obtiene todos los registros de las 9 entidades (métodos `Get...` de sqlc) y renderiza la página con `views.Index` |
-| `POST /<entidades>`      | Parsea el formulario, crea el registro (métodos `Create...` de sqlc) y redirige a `/` con `303 See Other`         |
-| `GET /static/styles.css` | Hoja de estilos propia (además de Pico.css desde CDN)                                                             |
+| Ruta                                | Qué hace                                                                                                                       |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /`                             | Obtiene todos los registros de las 9 entidades (métodos `Get...` de sqlc) y renderiza la página completa con `views.Index`     |
+| `GET /<entidades>`                  | Devuelve solo la lista de esa entidad (fragmento HTML)                                                                         |
+| `POST /<entidades>`                 | Crea el registro. Si el pedido viene de HTMX devuelve la lista actualizada; si no, redirige a `/`.     |
+| `GET /<entidades>/{id}`             | Devuelve la fila de un registro (la usa el botón Cancelar de la edición)                                                       |
+| `GET /<entidades>/{id}/edit`        | Devuelve la fila convertida en formulario de edición                                                                           |
+| `PUT /<entidades>/{id}`             | Guarda los cambios  y devuelve la fila actualizada                                                |
+| `DELETE /<entidades>/{id}`          | Borra el registro y responde `200` vacío, así HTMX saca la fila de la lista                                                    |
+| `GET /static/...`                   | `styles.css` y `js/htmx.min.js`                                                                 |
 
-Rutas de creación: `/films`, `/genres`, `/castmembers`, `/statuses`, `/users`, `/reviews`, `/filmcasts`, `/filmgenres`, `/filmuserstatuses`.
+Las claves foráneas tienen ON DELETE CASCADE: borrar una película también borra sus reseñas, géneros asignados, elenco y estados de usuario. Por eso los botones Borrar de las tablas "padre" piden confirmación (hx-confirm) diciendo qué más se va a borrar.
 
-Si los datos del formulario no son válidos (campo vacío, número o fecha con formato incorrecto, estrellas fuera de 1–5, IDs ≤ 0) la respuesta es `400 Bad Request`.
+## Decisiones
+
+Para que las listas se actualicen cuando borramos algo en cascada (por ejemplo, la relación película-género al borrar una película) usamos HX-Trigger: el DELETE avisa con un evento y cada lista afectada se vuelve a pedir sola. También evaluamos usar hx-partial con un handler en main.go que devuelva todas las listas juntas, y pasarle a FilmHandler los services de las otras tablas. Elegimos HX-Trigger porque no obliga a que los handlers conozcan datos de otras tablas, aunque hace un pedido por cada lista afectada.
 
 ## Modelo de entidades
 
@@ -32,7 +39,7 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 │   ├── schema/                # DDL de las tablas (Postgres)
 │   ├── queries/               # Queries .sql usadas por sqlc
 │   └── sqlc/                  # Código Go generado por sqlc (no se versiona)
-├── internal/                  # Lógica dividida en capas (handler (POST de las tablas), service, repository, errors)
+├── internal/                  # Lógica dividida en capas (handler (GET/POST/PUT/DELETE de las tablas), service, repository, errors)
 │   ├── dto.go                 # Structs compartidos entre capas y vistas
 │   ├── film/                  
 │   ├── user/                  
@@ -44,14 +51,12 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 │   ├── filmgenre/             
 │   └── filmuserstatus/        
 ├── views/                     # Componentes templ (+ los *_templ.go generados)
-│   ├── layout.templ           # Estructura base (HTML, HEAD con Pico.css, BODY) y página Index
-│   ├── entity_form.templ      # Formularios de creación de cada entidad
-│   └── entity_list.templ      # Listas de registros de cada entidad
+│   ├── layout.templ           # Estructura base (HTML, HEAD con Pico.css y HTMX, BODY) y página Index
+│   ├── entity_form.templ      # Formularios de creación de cada entidad (hx-post)
+│   └── entity_list.templ      # Listas y filas de cada entidad, con los botones Editar (hx-put) y Borrar (hx-delete)
 ├── static/
+│   ├── js/htmx.min.js         # HTMX servido localmente
 │   └── styles.css             # Hoja de estilos
-├── CRUDSimple_test.go         # Tests de BD para CRUD simple (Film, User, Genre, Status, CastMember)
-├── CRUDCompuesto_test.go      # Tests de BD para relaciones (Review, FilmCast, FilmGenre, FilmUserStatus)
-├── requests.hurl              # Pruebas HTTP de los formularios (Post/Redirect/Get) con Hurl
 ├── Dockerfile
 ├── docker-compose.yml
 ├── Makefile
@@ -66,32 +71,24 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 - Docker y Docker Compose
 - [sqlc](https://sqlc.dev)
 - [templ](https://templ.guide)
-- [Hurl](https://hurl.dev)
 
 ## Setup
 
-1. Clonar el repositorio y hacer checkout sobre el branch `tp5`:
+1. Clonar el repositorio y hacer checkout sobre el branch `tp6`:
 
 ```bash
 git clone https://github.com/IgnacioBarboza/TPGrupalWeb/
 cd TPGrupalWeb
-git checkout tp5
+git checkout tp6
 ```
 
-
-Hacer todo de una (BD limpia, regenerar sqlc y templ, levantar Docker, correr las pruebas de Hurl y apagar):
-
-```bash
-make start
-```
-
-2. Alternativamente, levantar el servidor para usarlo desde el navegador (copia `.env.example` a `.env`, genera sqlc si falta y regenera templ):
+2. Levantar el servidor para usarlo desde el navegador (copia `.env.example` a `.env`, genera sqlc si falta y regenera templ):
 
 ```bash
 make start-server
 ```
 
-Abrir [http://localhost:8080](http://localhost:8080): se ven todas las listas y se pueden crear registros desde los formularios (cada envío recarga la página completa). Para frenarlo: `Ctrl+C` o `make stop-server`.
+Abrir [http://localhost:8080](http://localhost:8080): se ven todas las listas y se pueden crear, editar y borrar registros sin que la página se recargue. Para frenarlo: `Ctrl+C` o `make stop-server`.
 
 ## Comandos
 
@@ -105,28 +102,11 @@ Los más usados:
 
 | Comando                 | Qué hace                                                                        |
 | ----------------------- | ------------------------------------------------------------------------------- |
-| **make start**          | Limpia BD, regenera sqlc y templ, levanta Docker, corre `requests.hurl` y apaga |
 | **make start-server**   | Regenera templ y levanta el servidor en primer plano                            |
 | **make stop-server**    | Frena el servidor conservando los datos de la BD                                |
-| **make clean-db**       | Frena el servidor y borra los volúmenes de la BD (reinicia IDs)                 |
-| **make test**           | Ejecuta `go test` dentro del contenedor                                         |
-| **make generate-templ** | Borra y regenera los `*_templ.go` de `views/`                                   |
-| **make generate-sqlc**  | Borra y regenera el código de `sqlc` en `db/sqlc/`                              |
+| **make clean-db**       | Frena el servidor y borra los volúmenes de la BD (reinicia IDs)               |
+| **make generate-templ** | Borra y regenera los *_templ.go de views/                                   |
+| **make generate-sqlc**  | Borra y regenera el código de sqlc en db/sqlc/                        |
 | **make rebuild**        | Reconstruye y levanta los contenedores                                          |
 
-## Tests
-
-### Pruebas HTTP de los formularios (`requests.hurl`) — _incluidas en `make start`_
-
-Prueban el patrón Post/Redirect/Get de las 9 entidades en `http://localhost:8080`:
-
-- cada `POST /<entidades>` válido debe responder `303` con `Location: /`;
-- los `POST` inválidos deben responder `400`;
-- después, `GET /` debe mostrar el registro creado. Los IDs se capturan del HTML para crear las relaciones (FilmCast, FilmGenre, FilmUserStatus y Review).
-
-Con el servidor levantado (`make start-server`) también se pueden correr a mano:
-
-```bash
-hurl --test requests.hurl
-```
 

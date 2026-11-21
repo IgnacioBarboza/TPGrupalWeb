@@ -12,12 +12,17 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
+	"database/sql"
+	"errors"
 )
 
 // Interfaz
 type CastMemberRepository interface {
 	GetCastMembers(ctx context.Context) ([]dto.Castmember, error)
 	Create(ctx context.Context, castMember dto.Castmember) (dto.Castmember, error)
+	Delete(ctx context.Context, id int32) error
+	Get(ctx context.Context, id int32) (dto.Castmember, error)
+	Update(ctx context.Context, castMember dto.Castmember) error
 }
 
 type SQLCRepository struct {
@@ -53,4 +58,31 @@ func (r *SQLCRepository) Create(ctx context.Context, castMember dto.Castmember) 
 		return dto.Castmember{}, err
 	}
 	return dto.Castmember(c), nil
+}
+
+// Delete borra el miembro del elenco con la query DeleteCastMember de sqlc.
+func (r *SQLCRepository) Delete(ctx context.Context, id int32) error {
+	return r.queries.DeleteCastMember(ctx, id)
+}
+
+// Get devuelve el miembro del elenco, o ErrCastMemberNotFound si no existe.
+func (r *SQLCRepository) Get(ctx context.Context, id int32) (dto.Castmember, error) {
+	c, err := r.queries.GetCastMember(ctx, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return dto.Castmember{}, ErrCastMemberNotFound
+	}
+	if err != nil {
+		return dto.Castmember{}, err
+	}
+	return dto.Castmember(c), nil
+}
+
+// Update guarda los cambios de el miembro del elenco con la query UpdateCastMember de sqlc.
+func (r *SQLCRepository) Update(ctx context.Context, castMember dto.Castmember) error {
+	return r.queries.UpdateCastMember(ctx, db.UpdateCastMemberParams{
+		Castmemberid:     castMember.Castmemberid,
+		Castmembername:   castMember.Castmembername,
+		Castmemberrole:   castMember.Castmemberrole,
+		Castmembergender: castMember.Castmembergender,
+	})
 }

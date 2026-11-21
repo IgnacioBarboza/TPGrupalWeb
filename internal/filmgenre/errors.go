@@ -4,4 +4,5 @@ import "errors"
 
 var (
 	ErrInvalidFilmGenreIDs = errors.New("El ID del género y el ID del film deben ser mayores a cero.")
+	ErrFilmGenreNotFound   = errors.New("Esa película no tiene ese género.")
 )

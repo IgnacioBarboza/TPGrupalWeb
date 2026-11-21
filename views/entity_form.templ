@@ -2,7 +2,14 @@ package views
 
 // 1. FILM FORM
 templ FilmForm() {
-	<form id="form-film" method="POST" action="/films">
+	<form id="form-film"
+	hx-post="/films"
+	hx-target="#list-films"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-film swap:innerHTML"
+	hx-status:5xx="target:#error-film swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-film').textContent = '' }">
+		<p id="error-film"></p>
 		<label for="film-title">Título:</label>
 		<input type="text" id="film-title" name="filmtitle" maxlength="200" required/>
 
@@ -18,7 +25,14 @@ templ FilmForm() {
 
 // 2. GENRE FORM
 templ GenreForm() {
-	<form id="form-genre" method="POST" action="/genres">
+	<form id="form-genre"
+	hx-post="/genres"
+	hx-target="#list-genres"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-genre swap:innerHTML"
+	hx-status:5xx="target:#error-genre swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-genre').textContent = '' }">
+		<p id="error-genre"></p>
 		<label for="genre-name">Nombre del género:</label>
 		<input type="text" id="genre-name" name="genrename" maxlength="30" required/>
 
@@ -28,7 +42,14 @@ templ GenreForm() {
 
 // 3. CAST MEMBER FORM
 templ CastMemberForm() {
-	<form id="form-castmember" method="POST" action="/castmembers">
+	<form id="form-castmember"
+	hx-post="/castmembers"
+	hx-target="#list-castmembers"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-castmember swap:innerHTML"
+	hx-status:5xx="target:#error-castmember swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-castmember').textContent = '' }">
+		<p id="error-castmember"></p>
 		<label for="castmember-name">Nombre:</label>
 		<input type="text" id="castmember-name" name="castmembername" maxlength="100" required/>
 
@@ -44,7 +65,14 @@ templ CastMemberForm() {
 
 // 4. STATUS FORM
 templ StatusForm() {
-	<form id="form-status" method="POST" action="/statuses">
+	<form id="form-status"
+	hx-post="/statuses"
+	hx-target="#list-statuses"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-status swap:innerHTML"
+	hx-status:5xx="target:#error-status swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-status').textContent = '' }">
+		<p id="error-status"></p>
 		<label for="status-name">Nombre del estado:</label>
 		<input type="text" id="status-name" name="statusname" maxlength="20" required/>
 
@@ -54,7 +82,14 @@ templ StatusForm() {
 
 // 5. USER FORM
 templ UserForm() {
-	<form id="form-user" method="POST" action="/users">
+	<form id="form-user"
+	hx-post="/users"
+	hx-target="#list-users"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-user swap:innerHTML"
+	hx-status:5xx="target:#error-user swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-user').textContent = '' }">
+		<p id="error-user"></p>
 		<label for="user-name">Nombre de usuario:</label>
 		<input type="text" id="user-name" name="username" maxlength="120" required/>
 
@@ -73,7 +108,14 @@ templ UserForm() {
 
 // 6. REVIEW FORM
 templ ReviewForm() {
-	<form id="form-review" method="POST" action="/reviews">
+	<form id="form-review"
+	hx-post="/reviews"
+	hx-target="#list-reviews"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-review swap:innerHTML"
+	hx-status:5xx="target:#error-review swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-review').textContent = '' }">
+		<p id="error-review"></p>
 		<label for="review-film-id">ID Película:</label>
 		<input type="number" id="review-film-id" name="reviewfilmid" min="1" required/>
 
@@ -92,7 +134,14 @@ templ ReviewForm() {
 
 // 7. FILM CAST FORM
 templ FilmCastForm() {
-	<form id="form-filmcast" method="POST" action="/filmcasts">
+	<form id="form-filmcast"
+	hx-post="/filmcasts"
+	hx-target="#list-filmcasts"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-filmcast swap:innerHTML"
+	hx-status:5xx="target:#error-filmcast swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-filmcast').textContent = '' }">
+		<p id="error-filmcast"></p>
 		<label for="filmcast-film-id">ID Película:</label>
 		<input type="number" id="filmcast-film-id" name="filmid" min="1" required/>
 
@@ -105,7 +154,14 @@ templ FilmCastForm() {
 
 // 8. FILM GENRE FORM
 templ FilmGenreForm() {
-	<form id="form-filmgenre" method="POST" action="/filmgenres">
+	<form id="form-filmgenre"
+	hx-post="/filmgenres"
+	hx-target="#list-filmgenres"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-filmgenre swap:innerHTML"
+	hx-status:5xx="target:#error-filmgenre swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-filmgenre').textContent = '' }">
+		<p id="error-filmgenre"></p>
 		<label for="filmgenre-genre-id">ID Género:</label>
 		<input type="number" id="filmgenre-genre-id" name="genre_genreid" min="1" required/>
 
@@ -118,7 +174,14 @@ templ FilmGenreForm() {
 
 // 9. FILM USER STATUS FORM
 templ FilmUserStatusForm() {
-	<form id="form-filmuserstatus" method="POST" action="/filmuserstatuses">
+	<form id="form-filmuserstatus"
+	hx-post="/filmuserstatuses"
+	hx-target="#list-filmuserstatuses"
+	hx-swap="outerHTML"
+	hx-status:4xx="target:#error-filmuserstatus swap:innerHTML"
+	hx-status:5xx="target:#error-filmuserstatus swap:innerHTML"
+	hx-on:htmx:after:swap="if (ctx.response.raw.ok) { this.reset(); this.querySelector('#error-filmuserstatus').textContent = '' }">
+		<p id="error-filmuserstatus"></p>
 		<label for="fus-film-id">ID Película:</label>
 		<input type="number" id="fus-film-id" name="film_filmid" min="1" required/>
 

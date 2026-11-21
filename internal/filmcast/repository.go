@@ -12,6 +12,8 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
+	"database/sql"
+	"errors"
 )
 
 // Interfaz
@@ -19,6 +21,9 @@ import (
 type FilmCastRepository interface {
 	GetFilmCasts(ctx context.Context) ([]dto.Filmcast, error)
 	Create(ctx context.Context, filmCast dto.Filmcast) (dto.Filmcast, error)
+	Delete(ctx context.Context, filmID, castMemberID int32) error
+	Get(ctx context.Context, filmID, castMemberID int32) (dto.Filmcast, error)
+	Update(ctx context.Context, filmID, castMemberID int32, filmCast dto.Filmcast) error
 }
 
 type SQLCRepository struct {
@@ -53,4 +58,31 @@ func (r *SQLCRepository) Create(ctx context.Context, filmCast dto.Filmcast) (dto
 		return dto.Filmcast{}, err
 	}
 	return dto.Filmcast(fc), nil
+}
+
+// Delete borra la relación película-elenco con la query DeleteFilmCast de sqlc.
+func (r *SQLCRepository) Delete(ctx context.Context, filmID, castMemberID int32) error {
+	return r.queries.DeleteFilmCast(ctx, db.DeleteFilmCastParams{Filmid: filmID, Castmemberid: castMemberID})
+}
+
+// Get devuelve la relación película-elenco, o ErrFilmCastNotFound si no existe.
+func (r *SQLCRepository) Get(ctx context.Context, filmID, castMemberID int32) (dto.Filmcast, error) {
+	row, err := r.queries.GetFilmCast(ctx, db.GetFilmCastParams{Filmid: filmID, Castmemberid: castMemberID})
+	if errors.Is(err, sql.ErrNoRows) {
+		return dto.Filmcast{}, ErrFilmCastNotFound
+	}
+	if err != nil {
+		return dto.Filmcast{}, err
+	}
+	return dto.Filmcast(row), nil
+}
+
+// Update reemplaza el par (filmID, castMemberID) por el de filmCast, con la query UpdateFilmCast de sqlc.
+func (r *SQLCRepository) Update(ctx context.Context, filmID, castMemberID int32, filmCast dto.Filmcast) error {
+	return r.queries.UpdateFilmCast(ctx, db.UpdateFilmCastParams{
+		NewFilmID:       filmCast.Filmid,
+		NewCastMemberID: filmCast.Castmemberid,
+		FilmID:          filmID,
+		CastMemberID:    castMemberID,
+	})
 }

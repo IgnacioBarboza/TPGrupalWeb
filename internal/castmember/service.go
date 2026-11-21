@@ -45,3 +45,21 @@ func validateCastMember(castMember dto.Castmember) error {
 	}
 	return nil
 }
+
+// Delete borra el miembro del elenco.
+func (s *CastMemberService) Delete(ctx context.Context, id int32) error {
+	return s.repo.Delete(ctx, id)
+}
+
+// Get devuelve el miembro del elenco.
+func (s *CastMemberService) Get(ctx context.Context, id int32) (dto.Castmember, error) {
+	return s.repo.Get(ctx, id)
+}
+
+// Update valida el miembro del elenco con las mismas reglas que Create y guarda los cambios.
+func (s *CastMemberService) Update(ctx context.Context, castMember dto.Castmember) error {
+	if err := validateCastMember(castMember); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, castMember)
+}

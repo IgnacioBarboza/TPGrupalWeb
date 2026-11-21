@@ -39,3 +39,21 @@ func validateFilmCast(filmCast dto.Filmcast) error {
 	}
 	return nil
 }
+
+// Delete borra la relación película-elenco.
+func (s *FilmCastService) Delete(ctx context.Context, filmID, castMemberID int32) error {
+	return s.repo.Delete(ctx, filmID, castMemberID)
+}
+
+// Get devuelve la relación película-elenco.
+func (s *FilmCastService) Get(ctx context.Context, filmID, castMemberID int32) (dto.Filmcast, error) {
+	return s.repo.Get(ctx, filmID, castMemberID)
+}
+
+// Update valida el par nuevo con las mismas reglas que Create y reemplaza al par (filmID, castMemberID).
+func (s *FilmCastService) Update(ctx context.Context, filmID, castMemberID int32, filmCast dto.Filmcast) error {
+	if err := validateFilmCast(filmCast); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, filmID, castMemberID, filmCast)
+}

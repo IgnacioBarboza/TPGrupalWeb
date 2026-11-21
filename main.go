@@ -161,6 +161,7 @@ func getPageData(ctx context.Context) (views.PageData, error) {
 }
 
 func HandlerPrincipal(w http.ResponseWriter, r *http.Request) {
+	// RENDERIZAR TODA LA PAGINA
 
 	// Obtiene los datos de la página desde la base de datos
 	data, err := getPageData(r.Context())
@@ -190,16 +191,80 @@ func main() {
 	// Página principal: solo la ruta exacta "/"
 	mux.HandleFunc("GET /{$}", HandlerPrincipal)
 
+	// Un handler por entidad: atiende el POST del formulario y el GET de la lista
+	filmHandler := film.NewFilmHandler(filmSvc)
+	genreHandler := Genre.NewGenreHandler(genreSvc)
+	castMemberHandler := CastMember.NewCastMemberHandler(castMemberSvc)
+	statusHandler := Status.NewStatusHandler(statusSvc)
+	userHandler := User.NewUserHandler(userSvc)
+	reviewHandler := Review.NewReviewHandler(reviewSvc)
+	filmCastHandler := FilmCast.NewFilmCastHandler(filmCastSvc)
+	filmGenreHandler := FilmGenre.NewFilmGenreHandler(filmGenreSvc)
+	filmUserStatusHandler := FilmUserStatus.NewFilmUserStatusHandler(filmUserStatusSvc)
+
 	// Formularios: POST /<entidades> crea el registro y redirige a "/" (PRG)
-	mux.HandleFunc("POST /films", film.NewFilmHandler(filmSvc).CreateFromForm)
-	mux.HandleFunc("POST /genres", Genre.NewGenreHandler(genreSvc).CreateFromForm)
-	mux.HandleFunc("POST /castmembers", CastMember.NewCastMemberHandler(castMemberSvc).CreateFromForm)
-	mux.HandleFunc("POST /statuses", Status.NewStatusHandler(statusSvc).CreateFromForm)
-	mux.HandleFunc("POST /users", User.NewUserHandler(userSvc).CreateFromForm)
-	mux.HandleFunc("POST /reviews", Review.NewReviewHandler(reviewSvc).CreateFromForm)
-	mux.HandleFunc("POST /filmcasts", FilmCast.NewFilmCastHandler(filmCastSvc).CreateFromForm)
-	mux.HandleFunc("POST /filmgenres", FilmGenre.NewFilmGenreHandler(filmGenreSvc).CreateFromForm)
-	mux.HandleFunc("POST /filmuserstatuses", FilmUserStatus.NewFilmUserStatusHandler(filmUserStatusSvc).CreateFromForm)
+	mux.HandleFunc("POST /films", filmHandler.CreateFromForm)
+	mux.HandleFunc("POST /genres", genreHandler.CreateFromForm)
+	mux.HandleFunc("POST /castmembers", castMemberHandler.CreateFromForm)
+	mux.HandleFunc("POST /statuses", statusHandler.CreateFromForm)
+	mux.HandleFunc("POST /users", userHandler.CreateFromForm)
+	mux.HandleFunc("POST /reviews", reviewHandler.CreateFromForm)
+	mux.HandleFunc("POST /filmcasts", filmCastHandler.CreateFromForm)
+	mux.HandleFunc("POST /filmgenres", filmGenreHandler.CreateFromForm)
+	mux.HandleFunc("POST /filmuserstatuses", filmUserStatusHandler.CreateFromForm)
+
+	// Listas: GET /<entidades> devuelve solo la lista de esa entidad (fragmento HTML)
+	mux.HandleFunc("GET /films", filmHandler.ListFilms)
+	mux.HandleFunc("GET /genres", genreHandler.ListGenres)
+	mux.HandleFunc("GET /castmembers", castMemberHandler.ListCastMembers)
+	mux.HandleFunc("GET /statuses", statusHandler.ListStatuses)
+	mux.HandleFunc("GET /users", userHandler.ListUsers)
+	mux.HandleFunc("GET /reviews", reviewHandler.ListReviews)
+	mux.HandleFunc("GET /filmcasts", filmCastHandler.ListFilmCasts)
+	mux.HandleFunc("GET /filmgenres", filmGenreHandler.ListFilmGenres)
+	mux.HandleFunc("GET /filmuserstatuses", filmUserStatusHandler.ListFilmUserStatuses)
+
+	// Borrado: DELETE /<entidades>/{id} responde 200 vacío. Las relaciones se identifican con dos IDs
+	mux.HandleFunc("DELETE /films/{id}", filmHandler.Delete)
+	mux.HandleFunc("DELETE /genres/{id}", genreHandler.Delete)
+	mux.HandleFunc("DELETE /castmembers/{id}", castMemberHandler.Delete)
+	mux.HandleFunc("DELETE /statuses/{id}", statusHandler.Delete)
+	mux.HandleFunc("DELETE /users/{id}", userHandler.Delete)
+	mux.HandleFunc("DELETE /reviews/{filmid}/{userid}", reviewHandler.Delete)
+	mux.HandleFunc("DELETE /filmcasts/{filmid}/{castmemberid}", filmCastHandler.Delete)
+	mux.HandleFunc("DELETE /filmgenres/{genreid}/{filmid}", filmGenreHandler.Delete)
+	mux.HandleFunc("DELETE /filmuserstatuses/{filmid}/{userid}", filmUserStatusHandler.Delete)
+
+	// Edición (click to edit): GET .../{id} devuelve la fila, GET .../{id}/edit la fila como formulario
+	// y PUT .../{id} guarda y devuelve la fila actualizada
+	mux.HandleFunc("GET /films/{id}", filmHandler.Item)
+	mux.HandleFunc("GET /films/{id}/edit", filmHandler.EditForm)
+	mux.HandleFunc("PUT /films/{id}", filmHandler.Update)
+	mux.HandleFunc("GET /genres/{id}", genreHandler.Item)
+	mux.HandleFunc("GET /genres/{id}/edit", genreHandler.EditForm)
+	mux.HandleFunc("PUT /genres/{id}", genreHandler.Update)
+	mux.HandleFunc("GET /castmembers/{id}", castMemberHandler.Item)
+	mux.HandleFunc("GET /castmembers/{id}/edit", castMemberHandler.EditForm)
+	mux.HandleFunc("PUT /castmembers/{id}", castMemberHandler.Update)
+	mux.HandleFunc("GET /statuses/{id}", statusHandler.Item)
+	mux.HandleFunc("GET /statuses/{id}/edit", statusHandler.EditForm)
+	mux.HandleFunc("PUT /statuses/{id}", statusHandler.Update)
+	mux.HandleFunc("GET /users/{id}", userHandler.Item)
+	mux.HandleFunc("GET /users/{id}/edit", userHandler.EditForm)
+	mux.HandleFunc("PUT /users/{id}", userHandler.Update)
+	mux.HandleFunc("GET /reviews/{filmid}/{userid}", reviewHandler.Item)
+	mux.HandleFunc("GET /reviews/{filmid}/{userid}/edit", reviewHandler.EditForm)
+	mux.HandleFunc("PUT /reviews/{filmid}/{userid}", reviewHandler.Update)
+	mux.HandleFunc("GET /filmuserstatuses/{filmid}/{userid}", filmUserStatusHandler.Item)
+	mux.HandleFunc("GET /filmuserstatuses/{filmid}/{userid}/edit", filmUserStatusHandler.EditForm)
+	mux.HandleFunc("PUT /filmuserstatuses/{filmid}/{userid}", filmUserStatusHandler.Update)
+	// En FilmCast y FilmGenre la fila es solo el par de IDs: la URL trae el par actual y el formulario el nuevo
+	mux.HandleFunc("GET /filmcasts/{filmid}/{castmemberid}", filmCastHandler.Item)
+	mux.HandleFunc("GET /filmcasts/{filmid}/{castmemberid}/edit", filmCastHandler.EditForm)
+	mux.HandleFunc("PUT /filmcasts/{filmid}/{castmemberid}", filmCastHandler.Update)
+	mux.HandleFunc("GET /filmgenres/{genreid}/{filmid}", filmGenreHandler.Item)
+	mux.HandleFunc("GET /filmgenres/{genreid}/{filmid}/edit", filmGenreHandler.EditForm)
+	mux.HandleFunc("PUT /filmgenres/{genreid}/{filmid}", filmGenreHandler.Update)
 
 	log.Println("Servidor escuchando en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))

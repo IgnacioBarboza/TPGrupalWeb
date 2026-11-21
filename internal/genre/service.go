@@ -39,3 +39,21 @@ func validateGenre(genre dto.Genre) error {
 	}
 	return nil
 }
+
+// Delete borra el género.
+func (s *GenreService) Delete(ctx context.Context, id int32) error {
+	return s.repo.Delete(ctx, id)
+}
+
+// Get devuelve el género.
+func (s *GenreService) Get(ctx context.Context, id int32) (dto.Genre, error) {
+	return s.repo.Get(ctx, id)
+}
+
+// Update valida el género con las mismas reglas que Create y guarda los cambios.
+func (s *GenreService) Update(ctx context.Context, genre dto.Genre) error {
+	if err := validateGenre(genre); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, genre)
+}

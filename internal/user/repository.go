@@ -12,12 +12,17 @@ import (
 	db "WebGrupal/db/sqlc"
 	dto "WebGrupal/internal"
 	"context"
+	"database/sql"
+	"errors"
 )
 
 // Interfaz
 type UserRepository interface {
 	GetUsers(ctx context.Context) ([]dto.User, error)
 	Create(ctx context.Context, user dto.User) (dto.User, error)
+	Delete(ctx context.Context, id int32) error
+	Get(ctx context.Context, id int32) (dto.User, error)
+	Update(ctx context.Context, user dto.User) error
 }
 
 type SQLCRepository struct {
@@ -54,4 +59,32 @@ func (r *SQLCRepository) Create(ctx context.Context, user dto.User) (dto.User, e
 		return dto.User{}, err
 	}
 	return dto.User(u), nil
+}
+
+// Delete borra el usuario con la query DeleteUser de sqlc.
+func (r *SQLCRepository) Delete(ctx context.Context, id int32) error {
+	return r.queries.DeleteUser(ctx, id)
+}
+
+// Get devuelve el usuario, o ErrUserNotFound si no existe.
+func (r *SQLCRepository) Get(ctx context.Context, id int32) (dto.User, error) {
+	u, err := r.queries.GetUser(ctx, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return dto.User{}, ErrUserNotFound
+	}
+	if err != nil {
+		return dto.User{}, err
+	}
+	return dto.User(u), nil
+}
+
+// Update guarda los cambios de el usuario con la query UpdateUser de sqlc.
+func (r *SQLCRepository) Update(ctx context.Context, user dto.User) error {
+	return r.queries.UpdateUser(ctx, db.UpdateUserParams{
+		Userid:             user.Userid,
+		Username:           user.Username,
+		Userpasswordhashed: user.Userpasswordhashed,
+		Userbirthday:       user.Userbirthday,
+		Usergenre:          user.Usergenre,
+	})
 }

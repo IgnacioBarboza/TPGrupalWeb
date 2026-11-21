@@ -7,153 +7,549 @@ import (
 
 // 1. FILM LIST
 templ FilmList(films []dto.Film) {
-	<ul id="list-films">
-		if len(films) == 0 {
-			<li>No hay películas cargadas.</li>
-		} else {
-			for _, film := range films {
-				<li>
-					<span>
-						{ fmt.Sprintf("[ID: %d] %s - Estreno: %s - Duración: %d min", film.Filmid, film.Filmtitle, film.Filmreleasedate.Format("2006-01-02"), film.Filmduration) }
-					</span>
-				</li>
+	<div id="list-films">
+		<ul>
+			if len(films) == 0 {
+				<li>No hay películas cargadas.</li>
+			} else {
+				for _, film := range films {
+					@FilmItem(film)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 2. GENRE LIST
 templ GenreList(genres []dto.Genre) {
-	<ul id="list-genres">
-		if len(genres) == 0 {
-			<li>No hay géneros cargados.</li>
-		} else {
-			for _, genre := range genres {
-				<li>
-					<span>
-						{ fmt.Sprintf("[ID: %d] %s", genre.Genreid, genre.Genrename) }
-					</span>
-				</li>
+	<div id="list-genres">
+		<ul>
+			if len(genres) == 0 {
+				<li>No hay géneros cargados.</li>
+			} else {
+				for _, genre := range genres {
+					@GenreItem(genre)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 3. CAST MEMBER LIST
 templ CastMemberList(castMembers []dto.Castmember) {
-	<ul id="list-castmembers">
-		if len(castMembers) == 0 {
-			<li>No hay miembros del elenco cargados.</li>
-		} else {
-			for _, cm := range castMembers {
-				<li>
-					<span>
-						{ fmt.Sprintf("[ID: %d] %s - Rol: %s - Género: %s", cm.Castmemberid, cm.Castmembername, cm.Castmemberrole, cm.Castmembergender) }
-					</span>
-				</li>
+	<div id="list-castmembers">
+		<ul>
+			if len(castMembers) == 0 {
+				<li>No hay miembros del elenco cargados.</li>
+			} else {
+				for _, cm := range castMembers {
+					@CastMemberItem(cm)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 4. STATUS LIST
 templ StatusList(statuses []dto.Status) {
-	<ul id="list-statuses">
-		if len(statuses) == 0 {
-			<li>No hay estados cargados.</li>
-		} else {
-			for _, st := range statuses {
-				<li>
-					<span>
-						{ fmt.Sprintf("[ID: %d] %s", st.Statusid, st.Statusname) }
-					</span>
-				</li>
+	<div id="list-statuses">
+		<ul>
+			if len(statuses) == 0 {
+				<li>No hay estados cargados.</li>
+			} else {
+				for _, st := range statuses {
+					@StatusItem(st)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 5. USER LIST
 templ UserList(users []dto.User) {
-	<ul id="list-users">
-		if len(users) == 0 {
-			<li>No hay usuarios cargados.</li>
-		} else {
-			for _, u := range users {
-				<li>
-					<span>
-						{ fmt.Sprintf("[ID: %d] %s - Nacimiento: %s - Género: %s", u.Userid, u.Username, u.Userbirthday.Format("2006-01-02"), u.Usergenre) }
-					</span>
-				</li>
+	<div id="list-users">
+		<ul>
+			if len(users) == 0 {
+				<li>No hay usuarios cargados.</li>
+			} else {
+				for _, u := range users {
+					@UserItem(u)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 6. REVIEW LIST
 templ ReviewList(reviews []dto.Review) {
-	<ul id="list-reviews">
-		if len(reviews) == 0 {
-			<li>No hay reseñas cargadas.</li>
-		} else {
-			for _, rev := range reviews {
-				<li>
-					<span>
-						{ fmt.Sprintf("[Película ID: %d | Usuario ID: %d] %d★ - %q", rev.Reviewfilmid, rev.Reviewuserid, rev.Reviewstars, rev.Reviewdescription) }
-					</span>
-				</li>
+	<div id="list-reviews"
+		hx-get="/reviews"
+		hx-trigger="filmDeleted from:body, userDeleted from:body"
+		hx-swap="outerHTML">
+		<ul>
+			if len(reviews) == 0 {
+				<li>No hay reseñas cargadas.</li>
+			} else {
+				for _, rev := range reviews {
+					@ReviewItem(rev)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 7. FILM CAST LIST
 templ FilmCastList(filmCasts []dto.Filmcast) {
-	<ul id="list-filmcasts">
-		if len(filmCasts) == 0 {
-			<li>No hay relaciones FilmCast cargadas.</li>
-		} else {
-			for _, fc := range filmCasts {
-				<li>
-					<span>
-						{ fmt.Sprintf("Película ID: %d ↔ Miembro Elenco ID: %d", fc.Filmid, fc.Castmemberid) }
-					</span>
-				</li>
+	<div id="list-filmcasts"
+		hx-get="/filmcasts"
+		hx-trigger="filmDeleted from:body, castMemberDeleted from:body"
+		hx-swap="outerHTML">
+		<ul>
+			if len(filmCasts) == 0 {
+				<li>No hay relaciones FilmCast cargadas.</li>
+			} else {
+				for _, fc := range filmCasts {
+					@FilmCastItem(fc)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 8. FILM GENRE LIST
 templ FilmGenreList(filmGenres []dto.Filmgenre) {
-	<ul id="list-filmgenres">
-		if len(filmGenres) == 0 {
-			<li>No hay relaciones FilmGenre cargadas.</li>
-		} else {
-			for _, fg := range filmGenres {
-				<li>
-					<span>
-						{ fmt.Sprintf("Género ID: %d ↔ Película ID: %d", fg.GenreGenreid, fg.FilmFilmid) }
-					</span>
-				</li>
+	<div id="list-filmgenres"
+		hx-get="/filmgenres"
+		hx-trigger="filmDeleted from:body, genreDeleted from:body"
+		hx-swap="outerHTML">
+		<ul>
+			if len(filmGenres) == 0 {
+				<li>No hay relaciones FilmGenre cargadas.</li>
+			} else {
+				for _, fg := range filmGenres {
+					@FilmGenreItem(fg)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
 }
 
 // 9. FILM USER STATUS LIST
 templ FilmUserStatusList(statuses []dto.Filmuserstatus) {
-	<ul id="list-filmuserstatuses">
-		if len(statuses) == 0 {
-			<li>No hay estados de película por usuario cargados.</li>
-		} else {
-			for _, fus := range statuses {
-				<li>
-					<span>
-						{ fmt.Sprintf("Película ID: %d | Usuario ID: %d → Estado ID: %d", fus.FilmFilmid, fus.UserUserid, fus.StatusStatusid) }
-					</span>
-				</li>
+	<div id="list-filmuserstatuses"
+		hx-get="/filmuserstatuses"
+		hx-trigger="filmDeleted from:body, userDeleted from:body, statusDeleted from:body"
+		hx-swap="outerHTML">
+		<ul>
+			if len(statuses) == 0 {
+				<li>No hay estados de película por usuario cargados.</li>
+			} else {
+				for _, fus := range statuses {
+					@FilmUserStatusItem(fus)
+				}
 			}
-		}
-	</ul>
+		</ul>
+	</div>
+}
+
+// FilmItem es la fila de una película en modo lectura, con los botones Editar y Borrar.
+templ FilmItem(film dto.Film) {
+	<li>
+		<span>
+			{ fmt.Sprintf("[ID: %d] %s - Estreno: %s - Duración: %d min", film.Filmid, film.Filmtitle, film.Filmreleasedate.Format("2006-01-02"), film.Filmduration) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/films/%d/edit", film.Filmid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/films/%d", film.Filmid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-confirm={ fmt.Sprintf("¿Borrar la película \"%s\"? También se borrarán sus reseñas, sus géneros asignados, su elenco y los estados que le pusieron los usuarios.", film.Filmtitle) }>
+			Borrar
+		</button>
+	</li>
+}
+
+// FilmEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a FilmItem.
+templ FilmEditItem(film dto.Film) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/films/%d", film.Filmid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-film-%d swap:innerHTML", film.Filmid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-film-%d swap:innerHTML", film.Filmid) }>
+			<input type="text" name="filmtitle" value={ film.Filmtitle } aria-label="Título" maxlength="200" required/>
+			<input type="date" name="filmreleasedate" value={ film.Filmreleasedate.Format("2006-01-02") } aria-label="Fecha de estreno" required/>
+			<input type="number" name="filmduration" value={ fmt.Sprint(film.Filmduration) } aria-label="Duración (min)" min="1" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/films/%d", film.Filmid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-film-%d", film.Filmid) }></p>
+		</form>
+	</li>
+}
+
+// GenreItem es la fila de un género en modo lectura, con los botones Editar y Borrar.
+templ GenreItem(genre dto.Genre) {
+	<li>
+		<span>
+			{ fmt.Sprintf("[ID: %d] %s", genre.Genreid, genre.Genrename) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/genres/%d/edit", genre.Genreid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/genres/%d", genre.Genreid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-confirm={ fmt.Sprintf("¿Borrar el género \"%s\"? También se quitará de todas las películas que lo tienen (las películas no se borran).", genre.Genrename) }>
+			Borrar
+		</button>
+	</li>
+}
+
+// GenreEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a GenreItem.
+templ GenreEditItem(genre dto.Genre) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/genres/%d", genre.Genreid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-genre-%d swap:innerHTML", genre.Genreid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-genre-%d swap:innerHTML", genre.Genreid) }>
+			<input type="text" name="genrename" value={ genre.Genrename } aria-label="Nombre del género" maxlength="30" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/genres/%d", genre.Genreid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-genre-%d", genre.Genreid) }></p>
+		</form>
+	</li>
+}
+
+// CastMemberItem es la fila de un miembro del elenco en modo lectura, con los botones Editar y Borrar.
+templ CastMemberItem(cm dto.Castmember) {
+	<li>
+		<span>
+			{ fmt.Sprintf("[ID: %d] %s - Rol: %s - Género: %s", cm.Castmemberid, cm.Castmembername, cm.Castmemberrole, cm.Castmembergender) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/castmembers/%d/edit", cm.Castmemberid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/castmembers/%d", cm.Castmemberid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-confirm={ fmt.Sprintf("¿Borrar a \"%s\"? También se quitará del elenco de todas sus películas (las películas no se borran).", cm.Castmembername) }>
+			Borrar
+		</button>
+	</li>
+}
+
+// CastMemberEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a CastMemberItem.
+templ CastMemberEditItem(cm dto.Castmember) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/castmembers/%d", cm.Castmemberid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-castmember-%d swap:innerHTML", cm.Castmemberid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-castmember-%d swap:innerHTML", cm.Castmemberid) }>
+			<input type="text" name="castmembername" value={ cm.Castmembername } aria-label="Nombre" maxlength="100" required/>
+			<input type="text" name="castmemberrole" value={ cm.Castmemberrole } aria-label="Rol" maxlength="1" required/>
+			<input type="text" name="castmembergender" value={ cm.Castmembergender } aria-label="Género" maxlength="1" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/castmembers/%d", cm.Castmemberid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-castmember-%d", cm.Castmemberid) }></p>
+		</form>
+	</li>
+}
+
+// StatusItem es la fila de un estado en modo lectura, con los botones Editar y Borrar.
+templ StatusItem(st dto.Status) {
+	<li>
+		<span>
+			{ fmt.Sprintf("[ID: %d] %s", st.Statusid, st.Statusname) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/statuses/%d/edit", st.Statusid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/statuses/%d", st.Statusid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-confirm={ fmt.Sprintf("¿Borrar el estado \"%s\"? También se borrarán los estados de película por usuario que lo usan.", st.Statusname) }>
+			Borrar
+		</button>
+	</li>
+}
+
+// StatusEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a StatusItem.
+templ StatusEditItem(st dto.Status) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/statuses/%d", st.Statusid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-status-%d swap:innerHTML", st.Statusid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-status-%d swap:innerHTML", st.Statusid) }>
+			<input type="text" name="statusname" value={ st.Statusname } aria-label="Nombre del estado" maxlength="20" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/statuses/%d", st.Statusid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-status-%d", st.Statusid) }></p>
+		</form>
+	</li>
+}
+
+// UserItem es la fila de un usuario en modo lectura, con los botones Editar y Borrar.
+templ UserItem(u dto.User) {
+	<li>
+		<span>
+			{ fmt.Sprintf("[ID: %d] %s - Nacimiento: %s - Género: %s", u.Userid, u.Username, u.Userbirthday.Format("2006-01-02"), u.Usergenre) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/users/%d/edit", u.Userid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/users/%d", u.Userid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-confirm={ fmt.Sprintf("¿Borrar al usuario \"%s\"? También se borrarán sus reseñas y los estados que les puso a las películas.", u.Username) }>
+			Borrar
+		</button>
+	</li>
+}
+
+// UserEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a UserItem.
+templ UserEditItem(u dto.User) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/users/%d", u.Userid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-user-%d swap:innerHTML", u.Userid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-user-%d swap:innerHTML", u.Userid) }>
+			<input type="text" name="username" value={ u.Username } aria-label="Nombre" maxlength="120" required/>
+			<input type="password" name="userpasswordhashed" aria-label="Nueva contraseña" placeholder="Nueva contraseña (vacío = no cambiar)" maxlength="200"/>
+			<input type="date" name="userbirthday" value={ u.Userbirthday.Format("2006-01-02") } aria-label="Fecha de nacimiento" required/>
+			<input type="text" name="usergenre" value={ u.Usergenre } aria-label="Género" maxlength="1" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/users/%d", u.Userid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-user-%d", u.Userid) }></p>
+		</form>
+	</li>
+}
+
+// ReviewItem es la fila de una reseña en modo lectura, con los botones Editar y Borrar.
+templ ReviewItem(rev dto.Review) {
+	<li>
+		<span>
+			{ fmt.Sprintf("[Película ID: %d | Usuario ID: %d] %d★ - %q", rev.Reviewfilmid, rev.Reviewuserid, rev.Reviewstars, rev.Reviewdescription) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/reviews/%d/%d/edit", rev.Reviewfilmid, rev.Reviewuserid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/reviews/%d/%d", rev.Reviewfilmid, rev.Reviewuserid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Borrar
+		</button>
+	</li>
+}
+
+// ReviewEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a ReviewItem.
+templ ReviewEditItem(rev dto.Review) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/reviews/%d/%d", rev.Reviewfilmid, rev.Reviewuserid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-review-%d-%d swap:innerHTML", rev.Reviewfilmid, rev.Reviewuserid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-review-%d-%d swap:innerHTML", rev.Reviewfilmid, rev.Reviewuserid) }>
+			<input type="number" name="reviewstars" value={ fmt.Sprint(rev.Reviewstars) } aria-label="Estrellas" min="1" max="5" required/>
+			<textarea name="reviewdescription" aria-label="Descripción" required>{ rev.Reviewdescription }</textarea>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/reviews/%d/%d", rev.Reviewfilmid, rev.Reviewuserid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-review-%d-%d", rev.Reviewfilmid, rev.Reviewuserid) }></p>
+		</form>
+	</li>
+}
+
+// FilmUserStatusItem es la fila de un estado de película por usuario en modo lectura, con los botones Editar y Borrar.
+templ FilmUserStatusItem(fus dto.Filmuserstatus) {
+	<li>
+		<span>
+			{ fmt.Sprintf("Película ID: %d | Usuario ID: %d → Estado ID: %d", fus.FilmFilmid, fus.UserUserid, fus.StatusStatusid) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/filmuserstatuses/%d/%d/edit", fus.FilmFilmid, fus.UserUserid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/filmuserstatuses/%d/%d", fus.FilmFilmid, fus.UserUserid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Borrar
+		</button>
+	</li>
+}
+
+// FilmUserStatusEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a FilmUserStatusItem.
+templ FilmUserStatusEditItem(fus dto.Filmuserstatus) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/filmuserstatuses/%d/%d", fus.FilmFilmid, fus.UserUserid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-filmuserstatus-%d-%d swap:innerHTML", fus.FilmFilmid, fus.UserUserid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-filmuserstatus-%d-%d swap:innerHTML", fus.FilmFilmid, fus.UserUserid) }>
+			<input type="number" name="status_statusid" value={ fmt.Sprint(fus.StatusStatusid) } aria-label="ID de estado" min="1" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/filmuserstatuses/%d/%d", fus.FilmFilmid, fus.UserUserid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-filmuserstatus-%d-%d", fus.FilmFilmid, fus.UserUserid) }></p>
+		</form>
+	</li>
+}
+
+// FilmCastItem es la fila de una relación película-elenco en modo lectura, con los botones Editar y Borrar.
+templ FilmCastItem(fc dto.Filmcast) {
+	<li>
+		<span>
+			{ fmt.Sprintf("Película ID: %d ↔ Miembro Elenco ID: %d", fc.Filmid, fc.Castmemberid) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/filmcasts/%d/%d/edit", fc.Filmid, fc.Castmemberid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/filmcasts/%d/%d", fc.Filmid, fc.Castmemberid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Borrar
+		</button>
+	</li>
+}
+
+// FilmCastEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a FilmCastItem.
+templ FilmCastEditItem(fc dto.Filmcast) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/filmcasts/%d/%d", fc.Filmid, fc.Castmemberid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-filmcast-%d-%d swap:innerHTML", fc.Filmid, fc.Castmemberid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-filmcast-%d-%d swap:innerHTML", fc.Filmid, fc.Castmemberid) }>
+			<input type="number" name="filmid" value={ fmt.Sprint(fc.Filmid) } aria-label="ID de película" min="1" required/>
+			<input type="number" name="castmemberid" value={ fmt.Sprint(fc.Castmemberid) } aria-label="ID de miembro del elenco" min="1" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/filmcasts/%d/%d", fc.Filmid, fc.Castmemberid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-filmcast-%d-%d", fc.Filmid, fc.Castmemberid) }></p>
+		</form>
+	</li>
+}
+
+// FilmGenreItem es la fila de una relación película-género en modo lectura, con los botones Editar y Borrar.
+templ FilmGenreItem(fg dto.Filmgenre) {
+	<li>
+		<span>
+			{ fmt.Sprintf("Género ID: %d ↔ Película ID: %d", fg.GenreGenreid, fg.FilmFilmid) }
+		</span>
+		<button type="button"
+			hx-get={ fmt.Sprintf("/filmgenres/%d/%d/edit", fg.GenreGenreid, fg.FilmFilmid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Editar
+		</button>
+		<button type="button"
+			hx-delete={ fmt.Sprintf("/filmgenres/%d/%d", fg.GenreGenreid, fg.FilmFilmid) }
+			hx-target="closest li"
+			hx-swap="outerHTML">
+			Borrar
+		</button>
+	</li>
+}
+
+// FilmGenreEditItem es la misma fila convertida en formulario: Guardar hace PUT y Cancelar vuelve a FilmGenreItem.
+templ FilmGenreEditItem(fg dto.Filmgenre) {
+	<li>
+		<form
+			hx-put={ fmt.Sprintf("/filmgenres/%d/%d", fg.GenreGenreid, fg.FilmFilmid) }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			hx-status:4xx={ fmt.Sprintf("target:#error-filmgenre-%d-%d swap:innerHTML", fg.GenreGenreid, fg.FilmFilmid) }
+			hx-status:5xx={ fmt.Sprintf("target:#error-filmgenre-%d-%d swap:innerHTML", fg.GenreGenreid, fg.FilmFilmid) }>
+			<input type="number" name="genre_genreid" value={ fmt.Sprint(fg.GenreGenreid) } aria-label="ID de género" min="1" required/>
+			<input type="number" name="film_filmid" value={ fmt.Sprint(fg.FilmFilmid) } aria-label="ID de película" min="1" required/>
+			<button type="submit">Guardar</button>
+			<button type="button"
+				hx-get={ fmt.Sprintf("/filmgenres/%d/%d", fg.GenreGenreid, fg.FilmFilmid) }
+				hx-target="closest li"
+				hx-swap="outerHTML">
+				Cancelar
+			</button>
+			<p id={ fmt.Sprintf("error-filmgenre-%d-%d", fg.GenreGenreid, fg.FilmFilmid) }></p>
+		</form>
+	</li>
 }

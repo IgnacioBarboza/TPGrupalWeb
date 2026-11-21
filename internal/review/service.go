@@ -42,3 +42,21 @@ func validateReview(review dto.Review) error {
 	}
 	return nil
 }
+
+// Delete borra la reseña.
+func (s *ReviewService) Delete(ctx context.Context, filmID, userID int32) error {
+	return s.repo.Delete(ctx, filmID, userID)
+}
+
+// Get devuelve la reseña.
+func (s *ReviewService) Get(ctx context.Context, filmID, userID int32) (dto.Review, error) {
+	return s.repo.Get(ctx, filmID, userID)
+}
+
+// Update valida la reseña con las mismas reglas que Create y guarda los cambios.
+func (s *ReviewService) Update(ctx context.Context, review dto.Review) error {
+	if err := validateReview(review); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, review)
+}

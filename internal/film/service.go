@@ -43,3 +43,21 @@ func validateFilm(film dto.Film) error {
 	}
 	return nil
 }
+
+// Delete borra la película.
+func (s *FilmService) Delete(ctx context.Context, id int32) error {
+	return s.repo.Delete(ctx, id)
+}
+
+// Get devuelve la película.
+func (s *FilmService) Get(ctx context.Context, id int32) (dto.Film, error) {
+	return s.repo.Get(ctx, id)
+}
+
+// Update valida la película con las mismas reglas que Create y guarda los cambios.
+func (s *FilmService) Update(ctx context.Context, film dto.Film) error {
+	if err := validateFilm(film); err != nil {
+		return err
+	}
+	return s.repo.Update(ctx, film)
+}
