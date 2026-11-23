@@ -235,8 +235,10 @@ func main() {
 	mux.HandleFunc("DELETE /filmgenres/{genreid}/{filmid}", filmGenreHandler.Delete)
 	mux.HandleFunc("DELETE /filmuserstatuses/{filmid}/{userid}", filmUserStatusHandler.Delete)
 
-	// Edición (click to edit): GET .../{id} devuelve la fila, GET .../{id}/edit la fila como formulario
-	// y PUT .../{id} guarda y devuelve la fila actualizada
+	// Edición: 
+	//	GET .../{id} devuelve la fila, 
+	//	GET .../{id}/edit la fila como formulario
+	//  PUT .../{id} guarda y devuelve la fila actualizada
 	mux.HandleFunc("GET /films/{id}", filmHandler.Item)
 	mux.HandleFunc("GET /films/{id}/edit", filmHandler.EditForm)
 	mux.HandleFunc("PUT /films/{id}", filmHandler.Update)
