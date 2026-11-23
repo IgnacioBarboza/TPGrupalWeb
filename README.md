@@ -19,11 +19,13 @@ El renderizado se hace del lado del servidor con **templ**, y desde el TP6 usamo
 | `DELETE /<entidades>/{id}`          | Borra el registro y responde `200` vacío, así HTMX saca la fila de la lista                                                    |
 | `GET /static/...`                   | `styles.css` y `js/htmx.min.js`                                                                 |
 
-Las claves foráneas tienen ON DELETE CASCADE: borrar una película también borra sus reseñas, géneros asignados, elenco y estados de usuario. Por eso los botones Borrar de las tablas "padre" piden confirmación (hx-confirm) diciendo qué más se va a borrar.
+Las FOREIGN KEYS tienen ON DELETE CASCADE: borrar una película también borra sus reseñas, géneros asignados, elenco y estados de usuario. Por eso los botones Borrar de las tablas "padre" piden confirmación (hx-confirm) diciendo qué más se va a borrar.
 
 ## Decisiones
 
-Para que las listas se actualicen cuando borramos algo en cascada (por ejemplo, la relación película-género al borrar una película) usamos HX-Trigger: el DELETE avisa con un evento y cada lista afectada se vuelve a pedir sola. También evaluamos usar hx-partial con un handler en main.go que devuelva todas las listas juntas, y pasarle a FilmHandler los services de las otras tablas. Elegimos HX-Trigger porque no obliga a que los handlers conozcan datos de otras tablas, aunque hace un pedido por cada lista afectada.
+Para que las listas se actualicen cuando borramos algo en cascada (por ejemplo, la relación película-género al borrar una película) usamos HX-Trigger: el DELETE avisa con un evento y cada lista afectada se vuelve a pedir sola. También evaluamos usar hx-partial con un handler en main.go que devuelva todas las listas juntas, y pasarle a FilmHandler los services de las otras tablas. Teniendo en cuenta el TRADE-OFF de que se genere una petición por lista afectada y el tamaño del projecto, decidimos utilizar HX-TRIGGER, ya que mantiene simple los handlers y deriva esta responsabilidad a la libreria de HTMX.
+
+Además de lo pedido en la consigna, decidimos agregar un boton con el texto de "Editar". El mismo genera un formulario reemplazando la fila de la tabla, permitiendo editar los campos y luego hacer una petición de metodo: PUT. Lo decidimos agregar debido a las correciones hechas en el TP5, ya que teniamos solamente los Handlers para el POST, GET y DELETE (faltando el UPDATE). 
 
 ## Modelo de entidades
 
@@ -51,7 +53,7 @@ El diagrama completo de entidades y relaciones está en [`EntidadesPrincipales.s
 │   ├── filmgenre/             
 │   └── filmuserstatus/        
 ├── views/                     # Componentes templ (+ los *_templ.go generados)
-│   ├── layout.templ           # Estructura base (HTML, HEAD con Pico.css y HTMX, BODY) y página Index
+│   ├── layout.templ           # Estructura base (HTML, HEAD con HTMX, BODY) y página Index
 │   ├── entity_form.templ      # Formularios de creación de cada entidad (hx-post)
 │   └── entity_list.templ      # Listas y filas de cada entidad, con los botones Editar (hx-put) y Borrar (hx-delete)
 ├── static/
