@@ -90,7 +90,7 @@ git checkout tp6
 make start-server
 ```
 
-Abrir [http://localhost:8080](http://localhost:8080): se ven todas las listas y se pueden crear, editar y borrar registros sin que la página se recargue. Para frenarlo: `Ctrl+C` o `make stop-server`.
+Abrir [http://localhost:8080](http://localhost:8080): se ven todas las listas y se pueden crear, editar y borrar registros sin que la página se recargue. Para frenarlo:`make stop-server`.
 
 ## Comandos
 
