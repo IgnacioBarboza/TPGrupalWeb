@@ -27,6 +27,8 @@
   --pico-primary-inverse: #ffffff;
 
   --pico-form-element-background-color: #ffffff;
+  --pico-form-element-active-background-color: #ffffff;
+  --pico-form-element-color: #1f2933;
   --pico-form-element-border-color: #c9ced6;
   --pico-form-element-focus-color: #1e3a5f;
 
